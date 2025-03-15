@@ -18,7 +18,7 @@ def img_to_html(img_path):
     return img_html
 
 # Scrape standings from ESPN
-url = 'https://www.espn.com/mlb/standings/_/group/overall'
+url = 'https://www.espn.com/mlb/standings/_/season/2024/group/overall'
 headers = {
     'User-Agent': 'Mozilla/5.0'
 }
@@ -90,37 +90,29 @@ chaseStandingsMobile = chaseStandingsMobile[['Team', 'W']]
 bryceStandingsMobile = bryceStandingsMobile[['Team', 'W']]
 zachStandingsMobile = zachStandingsMobile[['Team', 'W']]
 
+# add 'Athletics' to Bryce Standings
+brycesStandings = brycesStandings.append({'Team': 'Athletics', 'W': 0, 'L': 0, 'PCT': 0}, ignore_index=True)
+bryceStandingsMobile = bryceStandingsMobile.append({'Team': 'ATH', 'W': 0}, ignore_index=True)
+# change 'W' and 'L' in standings to 0
+chasesStandings['W'] = 0
+brycesStandings['W'] = 0
+zachsStandings['W'] = 0
+chasesStandings['L'] = 0
+brycesStandings['L'] = 0
+zachsStandings['L'] = 0
+chasesStandings['PCT'] = 0
+brycesStandings['PCT'] = 0
+zachsStandings['PCT'] = 0
+chaseStandingsMobile['W'] = 0
+bryceStandingsMobile['W'] = 0
+zachStandingsMobile['W'] = 0
+
 # Calculate total wins and losses
 chaseWins = chasesStandings['W'].sum()
 bryceWins = brycesStandings['W'].sum()
 zachWins = zachsStandings['W'].sum()
 
-# df = pd.read_excel('Wins_Over_Time.xlsx') 
-# # add on to end of dataframe with todays data and wins
-# todaysData = pd.DataFrame({'Day': date.today()-pd.Timedelta(days=1), 'Chase': [chaseWins], 'Bryce': [bryceWins], 'Zach': [zachWins]})  
-# df = pd.concat([df, todaysData], ignore_index=True)
-# # save to excel
-# df.to_excel('Wins_Over_Time.xlsx', index=False)
-# df.iloc[:, 1:] = df.iloc[:, 1:].sub(df.iloc[:, 1:].min(axis=1), axis=0)
-# # format dat as Oct-22
-# df['Day'] = pd.to_datetime(df['Day']).dt.strftime('%b-%d')
-
-
-# Read All-NBA data from CSV
-# allNBAs = pd.read_csv('allNBARemaining.csv')
-# allNBA = allNBAs.sample()
-# allNBAs = allNBAs.drop(allNBA.index)
-# allNBAs.to_csv('allNBARemaining.csv', index=False)
-
-# if allNBA['Last_Season'].values[0] == allNBA['First_Season'].values[0]:
-#     Years = allNBA['First_Season'].values[0]
-# else:
-#     Years = "Between "+allNBA['First_Season'].values[0] + ' and ' + allNBA['Last_Season'].values[0]
-    
-# Teams = allNBA['Team_List'].values[0].replace('[', '').replace(']', '').replace('\'', '')
-# Pos = allNBA['Positions'].values[0].replace('[', '').replace(']', '').replace('\'', '')
-
-url = 'https://www.espn.com/mlb/schedule/_/date/20250314'
+url = 'https://www.espn.com/mlb/schedule/_/date/20250319'
 headers = {
     'User-Agent': 'Mozilla/5.0'
 }
@@ -156,23 +148,6 @@ if schedule_table:
             'time': time,
             'odds': odds.split('O/U')[0].split('Line: ')[1] if odds else None,
         })
-        
-if yesterday_table:
-    rows = yesterday_table.find_all('tr', class_='Table__TR--sm')
-    for row in rows:
-        # Extract team names
-        teams = row.find_all('a', class_='AnchorLink')
-        away_team = teams[1]['href'].split('/')[-2] if teams else None
-        home_team = teams[3]['href'].split('/')[-2] if len(teams) > 1 else None
-        result = teams[4].text.strip() if len(teams) > 1 else None
-        
-        if result != "Postponed":
-            yesterday.append({
-                'away_team': away_team,
-                'home_team': home_team,
-                'result': result,
-                'winner': result.split(' ')[0] if result else None,
-            })
 
 # Create a DataFrame from the matchups list
 matchups_df = pd.DataFrame(matchups)
@@ -206,61 +181,15 @@ for i, row in matchups_df.iterrows():
     html_table += f"<td>{row['time']}</td><td>{row['odds']}</td></tr>"
 html_table += "</tbody></table>"
 
-# Create a DataFrame from the matchups list
-yesterday_df = pd.DataFrame(yesterday)
-html_table_yesterday = "<table><thead><tr><th>Home Team</th><th>Away Team</th><th>Result</th></tr></thead><tbody>"
-for i, row in yesterday_df.iterrows():
-    winner = row['winner']  
-    for team in ChasesTeams:
-        team = teamToAbbr[team]
-        if row['home_team'] == team.lower():
-            if winner.lower() == row['home_team']:
-                # make background #2774AE and font white
-                html_table_yesterday += f"<td style='background-color:#2774AE;color:white;'> <strong>{team}</strong></td>"
-            else:
-                html_table_yesterday += f"<td style='color:#2774AE'>{team}</td>"
-    for team in BrycesTeams:
-        team = teamToAbbr[team]
-        if row['home_team'] == team.lower():
-            if winner.lower() == row['home_team']:
-                # make background #57068c and font white
-                html_table_yesterday += f"<td style='background-color:#57068c;color:white;'> <strong>{team}</strong></td>"
-            else:
-                html_table_yesterday += f"<td style='color:#57068c'>{team}</td>"
-    for team in ZachsTeams:
-        team = teamToAbbr[team]
-        if row['home_team'] == team.lower():
-            if winner.lower() == row['home_team']:
-                # make background #e21833 and font white
-                html_table_yesterday += f"<td style='background-color:#e21833;color:white;'> <strong>{team}</strong></td>"
-            else:
-                html_table_yesterday += f"<td style='color:#e21833'>{team}</td>"
-    for team in ChasesTeams:
-        team = teamToAbbr[team]
-        if row['away_team'] == team.lower():
-            if winner.lower() == row['away_team']:
-                # make background #2774AE and font white
-                html_table_yesterday += f"<td style='background-color:#2774AE;color:white;'> <strong>{team}</strong></td>"
-            else:
-                html_table_yesterday += f"<td style='color:#2774AE'>{team}</td>"
-    for team in BrycesTeams:
-        team = teamToAbbr[team]
-        if row['away_team'] == team.lower():
-            if winner.lower() == row['away_team']:
-                # make background #57068c and font white
-                html_table_yesterday += f"<td style='background-color:#57068c;color:white;'> <strong>{team}</strong></td>"
-            else:
-                html_table_yesterday += f"<td style='color:#57068c'>{team}</td>"
-    for team in ZachsTeams:
-        team = teamToAbbr[team]
-        if row['away_team'] == team.lower():
-            if winner.lower() == row['away_team']:
-                # make background #e21833 and font white
-                html_table_yesterday += f"<td style='background-color:#e21833;color:white;'> <strong>{team}</strong></td>"
-            else:
-                html_table_yesterday += f"<td style='color:#e21833'>{team}</td>"         
-    html_table_yesterday += f"<td>{row['result']}</td></tr>"
-html_table_yesterday += "</tbody></table>"
+df = pd.read_excel('Wins_Over_Time.xlsx') 
+# add on to end of dataframe with todays data and wins
+todaysData = pd.DataFrame({'Day': date.today()-pd.Timedelta(days=1), 'Chase': [chaseWins], 'Bryce': [bryceWins], 'Zach': [zachWins]})  
+df = pd.concat([df, todaysData], ignore_index=True)
+# save to excel
+df.to_excel('Wins_Over_Time.xlsx', index=False)
+df.iloc[:, 1:] = df.iloc[:, 1:].sub(df.iloc[:, 1:].min(axis=1), axis=0)
+# format dat as Oct-22
+df['Day'] = pd.to_datetime(df['Day']).dt.strftime('%b-%d')
 
 # Generate HTML content
 html_content = f"""
@@ -590,7 +519,9 @@ html_content = f"""
 
 <div id="YG" class="tabcontent">
   <h2 style="text-align: center;">Yesterday's Games</h2>
-  {html_table_yesterday}
+  <div style="text-align: center;">
+    <td style="color:#57068c">Opening Day Baby!</td>
+    </div>
 </div>
 
 </body>
