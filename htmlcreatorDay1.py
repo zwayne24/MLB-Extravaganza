@@ -182,13 +182,7 @@ for i, row in matchups_df.iterrows():
 html_table += "</tbody></table>"
 
 df = pd.read_excel('Wins_Over_Time.xlsx') 
-# add on to end of dataframe with todays data and wins
-todaysData = pd.DataFrame({'Day': date.today()-pd.Timedelta(days=1), 'Chase': [chaseWins], 'Bryce': [bryceWins], 'Zach': [zachWins]})  
-df = pd.concat([df, todaysData], ignore_index=True)
-# save to excel
-df.to_excel('Wins_Over_Time.xlsx', index=False)
 df.iloc[:, 1:] = df.iloc[:, 1:].sub(df.iloc[:, 1:].min(axis=1), axis=0)
-# format dat as Oct-22
 df['Day'] = pd.to_datetime(df['Day']).dt.strftime('%b-%d')
 
 # Generate HTML content
@@ -328,6 +322,22 @@ html_content = f"""
         width: 100%;
     }}
     
+    .progress-container {{
+            width: 100%;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            position: relative;
+    }}
+
+    .progress-bar {{
+        height: 30px;
+        background-color: #4CAF50;
+        text-align: center;
+        color: black;
+        line-height: 30px;
+        border-radius: 5px;
+    }}
+    
     @media screen and (max-width: 600px) {{
         .column {{
             flex: 100%; /* Make each column take up full width */
@@ -401,6 +411,20 @@ html_content = f"""
 </head>
 <body>
 
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar">0/0</div>
+    </div>
+
+    <script>
+        let x = {0}
+        let y = {30*81}
+        let percentage = ((x / y) * 100).toFixed(1);
+
+        let progressBar = document.getElementById("progressBar");
+        progressBar.style.width = percentage + "%";
+        progressBar.innerText = percentage+ "%";
+    </script>
+
 <h1>MLB Extravaganza</h1>
 <div id="chart-container">
     <canvas id="myLineChart"></canvas>
@@ -410,6 +434,35 @@ html_content = f"""
     console.log('Creating chart...');
     var ctx = document.getElementById('myLineChart').getContext('2d');
     
+    const myLineChart = new Chart(ctx, {{
+        type: 'line',
+        data: {{
+            labels: {df['Day'].to_list()},
+            datasets: [{{
+                label: 'Chase',
+                data: {df['Chase'].to_list()},
+                fill: false,
+                borderColor: '#2774AE',
+                tension: 0.1,
+                pointRadius: 0
+            }},
+            {{
+                label: 'Bryce',
+                data: {df['Bryce'].to_list()},
+                fill: false,
+                borderColor: '#57068c',
+                tension: 0.1,
+                pointRadius: 0
+            }},
+            {{
+                label: 'Zach',
+                data: {df['Zach'].to_list()},
+                fill: false,
+                borderColor: '#e21833',
+                tension: 0.1,
+                pointRadius: 0
+            }}]
+        }},
     
         options: {{
             responsive: false,
