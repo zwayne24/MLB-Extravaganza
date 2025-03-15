@@ -95,32 +95,7 @@ chaseWins = chasesStandings['W'].sum()
 bryceWins = brycesStandings['W'].sum()
 zachWins = zachsStandings['W'].sum()
 
-# df = pd.read_excel('Wins_Over_Time.xlsx') 
-# # add on to end of dataframe with todays data and wins
-# todaysData = pd.DataFrame({'Day': date.today()-pd.Timedelta(days=1), 'Chase': [chaseWins], 'Bryce': [bryceWins], 'Zach': [zachWins]})  
-# df = pd.concat([df, todaysData], ignore_index=True)
-# # save to excel
-# df.to_excel('Wins_Over_Time.xlsx', index=False)
-# df.iloc[:, 1:] = df.iloc[:, 1:].sub(df.iloc[:, 1:].min(axis=1), axis=0)
-# # format dat as Oct-22
-# df['Day'] = pd.to_datetime(df['Day']).dt.strftime('%b-%d')
-
-
-# Read All-NBA data from CSV
-# allNBAs = pd.read_csv('allNBARemaining.csv')
-# allNBA = allNBAs.sample()
-# allNBAs = allNBAs.drop(allNBA.index)
-# allNBAs.to_csv('allNBARemaining.csv', index=False)
-
-# if allNBA['Last_Season'].values[0] == allNBA['First_Season'].values[0]:
-#     Years = allNBA['First_Season'].values[0]
-# else:
-#     Years = "Between "+allNBA['First_Season'].values[0] + ' and ' + allNBA['Last_Season'].values[0]
-    
-# Teams = allNBA['Team_List'].values[0].replace('[', '').replace(']', '').replace('\'', '')
-# Pos = allNBA['Positions'].values[0].replace('[', '').replace(']', '').replace('\'', '')
-
-url = 'https://www.espn.com/mlb/schedule/_/date/20250314'
+url = 'https://www.espn.com/mlb/schedule/'
 headers = {
     'User-Agent': 'Mozilla/5.0'
 }
@@ -399,6 +374,22 @@ html_content = f"""
         width: 100%;
     }}
     
+    .progress-container {{
+            width: 100%;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            position: relative;
+    }}
+
+    .progress-bar {{
+        height: 30px;
+        background-color: #4CAF50;
+        text-align: center;
+        color: black;
+        line-height: 30px;
+        border-radius: 5px;
+    }}
+    
     @media screen and (max-width: 600px) {{
         .column {{
             flex: 100%; /* Make each column take up full width */
@@ -471,6 +462,20 @@ html_content = f"""
 
 </head>
 <body>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar">0/0</div>
+    </div>
+
+    <script>
+        let x = {0}
+        let y = {30*81}
+        let percentage = ((x / y) * 100).toFixed(1);
+
+        let progressBar = document.getElementById("progressBar");
+        progressBar.style.width = percentage + "%";
+        progressBar.innerText = percentage+ "%";
+    </script>
 
 <h1>MLB Extravaganza</h1>
 <div id="chart-container">
