@@ -478,9 +478,6 @@ html_content = f"""
     </script>
 
 <h1>MLB Extravaganza</h1>
-<div id="chart-container">
-    <canvas id="myLineChart"></canvas>
-</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     console.log('Creating chart...');
