@@ -95,6 +95,16 @@ chaseWins = chasesStandings['W'].sum()
 bryceWins = brycesStandings['W'].sum()
 zachWins = zachsStandings['W'].sum()
 
+df = pd.read_excel('Wins_Over_Time.xlsx') 
+# add on to end of dataframe with todays data and wins
+todaysData = pd.DataFrame({'Day': date.today()-pd.Timedelta(days=1), 'Chase': [chaseWins], 'Bryce': [bryceWins], 'Zach': [zachWins]})  
+df = pd.concat([df, todaysData], ignore_index=True)
+# save to excel
+df.to_excel('Wins_Over_Time.xlsx', index=False)
+df.iloc[:, 1:] = df.iloc[:, 1:].sub(df.iloc[:, 1:].min(axis=1), axis=0)
+# format dat as Oct-22
+df['Day'] = pd.to_datetime(df['Day']).dt.strftime('%b-%d')
+
 url = 'https://www.espn.com/mlb/schedule/'
 headers = {
     'User-Agent': 'Mozilla/5.0'
@@ -478,11 +488,43 @@ html_content = f"""
     </script>
 
 <h1>MLB Extravaganza</h1>
+<div id="chart-container">
+    <canvas id="myLineChart"></canvas>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     console.log('Creating chart...');
     var ctx = document.getElementById('myLineChart').getContext('2d');
     
+    const myLineChart = new Chart(ctx, {{
+        type: 'line',
+        data: {{
+            labels: {df['Day'].to_list()},
+            datasets: [{{
+                label: 'Chase',
+                data: {df['Chase'].to_list()},
+                fill: false,
+                borderColor: '#2774AE',
+                tension: 0.1,
+                pointRadius: 0
+            }},
+            {{
+                label: 'Bryce',
+                data: {df['Bryce'].to_list()},
+                fill: false,
+                borderColor: '#57068c',
+                tension: 0.1,
+                pointRadius: 0
+            }},
+            {{
+                label: 'Zach',
+                data: {df['Zach'].to_list()},
+                fill: false,
+                borderColor: '#e21833',
+                tension: 0.1,
+                pointRadius: 0
+            }}]
+        }},
     
         options: {{
             responsive: false,
