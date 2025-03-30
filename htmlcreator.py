@@ -468,7 +468,7 @@ html_content = f"""
     </div>
 
     <script>
-        let x = {0}
+        let x = {chaseWins+ bryceWins + zachWins}
         let y = {30*81}
         let percentage = ((x / y) * 100).toFixed(1);
 
