@@ -1,3 +1,26 @@
+"""
+HTML Creator Script with Daily Guessing Game Feature
+"""
+
+# === Original Imports ===
+import pandas as pd
+from datetime import date
+import datetime
+
+# === Load Player of the Day Info ===
+schedule_df = pd.read_excel("player_schedule.xlsx")
+today_str = date.today().strftime("%Y-%m-%d")
+row = schedule_df[schedule_df["date"] == today_str]
+
+if not row.empty:
+    player_image_path = row.iloc[0]["image_path"]
+    player_name = row.iloc[0]["player_name"]
+    answers = row.iloc[0]["Answers"]
+else:
+    player_image_path = "images/default.jpg"
+    player_name = "Unknown"
+
+# === Original HTML Creation Logic ===
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -640,6 +663,46 @@ html_content = f"""
 </body>
 </html>
 """
+
+# === Daily Player Guessing Game Section ===
+guessing_game_template = '''
+<!-- Daily Guessing Game Section -->
+<div id="daily-guess" style="margin-top: 40px; text-align: center;">
+  <h2>Guess the Player!</h2>
+  <img src="{player_image_path}" alt="Guess the player" style="max-width: 200px;"><br><br>
+  <form id="guess-form" style="display: inline-block;">
+    <input type="text" id="guess-input" placeholder="Enter player name">
+    <button type="submit">Submit</button>
+  </form>
+  <p id="feedback" style="margin-top: 10px;"></p>
+</div>
+
+<script>
+  const acceptedAnswers = "{answers}".toLowerCase().split(",").map(s => s.trim());
+
+  document.getElementById("guess-form").addEventListener("submit", function(e) {{
+    e.preventDefault();
+    const userGuess = document.getElementById("guess-input").value.trim().toLowerCase();
+    const feedback = document.getElementById("feedback");
+
+    if (acceptedAnswers.includes(userGuess)) {{
+      feedback.textContent = "✅ Correct!";
+      feedback.style.color = "green";
+    }} else {{
+      feedback.textContent = "❌ Incorrect. Try again!";
+      feedback.style.color = "red";
+    }}
+  }});
+</script>
+'''
+guessing_game_html = guessing_game_template.format(
+    player_image_path=player_image_path,
+    answers=answers
+)
+
+# Append the guessing game HTML to the end of the page
+html_content += guessing_game_html
+
 # Write HTML content to a file
 with open('index.html', 'w') as f:
     f.write(html_content)
