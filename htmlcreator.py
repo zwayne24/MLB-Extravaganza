@@ -665,13 +665,14 @@ html_content = f"""
 """
 
 # === Daily Player Guessing Game Section ===
+# === Daily Player Guessing Game Section (Google Sheets Backend) ===
 guessing_game_template = '''
-<!-- Daily Guessing Game Section -->
+<!-- Daily Guessing Game Section with Google Sheets Logging -->
 <div id="daily-guess" style="margin-top: 40px; text-align: center;">
   <h2>Guess the Player!</h2>
   <img src="{player_image_path}" alt="Guess the player" style="max-width: 200px;"><br><br>
   <form id="guess-form" style="display: inline-block;">
-    <input type="text" id="guess-input" placeholder="Enter player name">
+    <input type="text" id="guess-input" placeholder="Enter player name" required>
     <button type="submit">Submit</button>
   </form>
   <p id="feedback" style="margin-top: 10px;"></p>
@@ -679,26 +680,39 @@ guessing_game_template = '''
 
 <script>
   const acceptedAnswers = "{answers}".toLowerCase().split(",").map(s => s.trim());
+  const loggingEndpoint = "https://script.google.com/macros/s/AKfycbwXxbDt4e46ugPc2WBzeTvMcgbiIvMQWV07rrQv-VCSAJAmu--p6e021rWWU-axwoK9-A/exec";
 
   document.getElementById("guess-form").addEventListener("submit", function(e) {{
     e.preventDefault();
-    const userGuess = document.getElementById("guess-input").value.trim().toLowerCase();
+    const guessInput = document.getElementById("guess-input");
+    const userGuess = guessInput.value.trim();
+    const userGuessLower = userGuess.toLowerCase();
     const feedback = document.getElementById("feedback");
 
-    if (acceptedAnswers.includes(userGuess)) {{
-      feedback.textContent = "✅ Correct!";
-      feedback.style.color = "green";
-    }} else {{
-      feedback.textContent = "❌ Incorrect. Try again!";
-      feedback.style.color = "red";
-    }}
+    const isCorrect = acceptedAnswers.includes(userGuessLower);
+    feedback.textContent = isCorrect ? "✅ Correct!" : "❌ Incorrect. Try again!";
+    feedback.style.color = isCorrect ? "green" : "red";
+
+    // Log guess (only guess — timestamp is created server-side)
+    fetch(loggingEndpoint, {{
+      method: "POST",
+      mode: "no-cors",
+      headers: {{
+        "Content-Type": "application/x-www-form-urlencoded"
+      }},
+      body: new URLSearchParams({{
+        guess: userGuess
+      }})
+    }});
   }});
 </script>
 '''
+
 guessing_game_html = guessing_game_template.format(
     player_image_path=player_image_path,
     answers=answers
 )
+
 
 # Append the guessing game HTML to the end of the page
 html_content += guessing_game_html
