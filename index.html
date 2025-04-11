@@ -249,10 +249,10 @@
     const myLineChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Mar-26', 'Mar-27', 'Mar-28', 'Mar-29', 'Mar-30', 'Mar-31', 'Apr-01', 'Apr-02', 'Apr-03', 'Apr-04', 'Apr-05', 'Apr-06', 'Apr-07', 'Apr-08', 'Apr-09', 'Apr-10'],
+            labels: ['Mar-26', 'Mar-27', 'Mar-28', 'Mar-29', 'Mar-30', 'Mar-31', 'Apr-01', 'Apr-02', 'Apr-03', 'Apr-04', 'Apr-05', 'Apr-06', 'Apr-07', 'Apr-08', 'Apr-09', 'Apr-10', 'Apr-10'],
             datasets: [{
                 label: 'Chase',
-                data: [0, 0, 3, 0, 2, 1, 4, 7, 5, 2, 0, 0, 2, 2, 2, 2],
+                data: [0, 0, 3, 0, 2, 1, 4, 7, 5, 2, 0, 0, 2, 2, 2, 2, 2],
                 fill: false,
                 borderColor: '#2774AE',
                 tension: 0.1,
@@ -260,7 +260,7 @@
             },
             {
                 label: 'Bryce',
-                data: [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 5, 5, 5, 2, 5],
+                data: [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 5, 5, 5, 2, 5, 5],
                 fill: false,
                 borderColor: '#57068c',
                 tension: 0.1,
@@ -268,7 +268,7 @@
             },
             {
                 label: 'Zach',
-                data: [2, 4, 7, 6, 6, 3, 4, 7, 5, 1, 1, 0, 0, 0, 0, 0],
+                data: [2, 4, 7, 6, 6, 3, 4, 7, 5, 1, 1, 0, 0, 0, 0, 0, 0],
                 fill: false,
                 borderColor: '#e21833',
                 tension: 0.1,
@@ -339,14 +339,14 @@
       <td>3</td>
     </tr>
     <tr>
-      <td>Texas Rangers</td>
-      <td>9</td>
-      <td>4</td>
-    </tr>
-    <tr>
       <td>Chicago Cubs</td>
       <td>9</td>
       <td>6</td>
+    </tr>
+    <tr>
+      <td>Texas Rangers</td>
+      <td>9</td>
+      <td>4</td>
     </tr>
     <tr>
       <td>Toronto Blue Jays</td>
@@ -359,9 +359,9 @@
       <td>6</td>
     </tr>
     <tr>
-      <td>Washington Nationals</td>
+      <td>Seattle Mariners</td>
       <td>5</td>
-      <td>7</td>
+      <td>8</td>
     </tr>
     <tr>
       <td>Tampa Bay Rays</td>
@@ -369,9 +369,9 @@
       <td>7</td>
     </tr>
     <tr>
-      <td>Seattle Mariners</td>
+      <td>Washington Nationals</td>
       <td>5</td>
-      <td>8</td>
+      <td>7</td>
     </tr>
     <tr>
       <td>Atlanta Braves</td>
@@ -400,11 +400,11 @@
       <td>10</td>
     </tr>
     <tr>
-      <td>TEX</td>
+      <td>CHC</td>
       <td>9</td>
     </tr>
     <tr>
-      <td>CHC</td>
+      <td>TEX</td>
       <td>9</td>
     </tr>
     <tr>
@@ -416,7 +416,7 @@
       <td>7</td>
     </tr>
     <tr>
-      <td>WSH</td>
+      <td>SEA</td>
       <td>5</td>
     </tr>
     <tr>
@@ -424,7 +424,7 @@
       <td>5</td>
     </tr>
     <tr>
-      <td>SEA</td>
+      <td>WSH</td>
       <td>5</td>
     </tr>
     <tr>
@@ -476,17 +476,7 @@
       <td>4</td>
     </tr>
     <tr>
-      <td>Kansas City Royals</td>
-      <td>7</td>
-      <td>6</td>
-    </tr>
-    <tr>
       <td>New York Yankees</td>
-      <td>7</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <td>Detroit Tigers</td>
       <td>7</td>
       <td>5</td>
     </tr>
@@ -496,12 +486,22 @@
       <td>7</td>
     </tr>
     <tr>
-      <td>Athletics</td>
+      <td>Detroit Tigers</td>
+      <td>7</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>Kansas City Royals</td>
+      <td>7</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td>Cincinnati Reds</td>
       <td>5</td>
       <td>8</td>
     </tr>
     <tr>
-      <td>Cincinnati Reds</td>
+      <td>Athletics</td>
       <td>5</td>
       <td>8</td>
     </tr>
@@ -535,15 +535,7 @@
       <td>8</td>
     </tr>
     <tr>
-      <td>KC</td>
-      <td>7</td>
-    </tr>
-    <tr>
       <td>NYY</td>
-      <td>7</td>
-    </tr>
-    <tr>
-      <td>DET</td>
       <td>7</td>
     </tr>
     <tr>
@@ -551,11 +543,19 @@
       <td>7</td>
     </tr>
     <tr>
-      <td>ATH</td>
-      <td>5</td>
+      <td>DET</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <td>KC</td>
+      <td>7</td>
     </tr>
     <tr>
       <td>CIN</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>ATH</td>
       <td>5</td>
     </tr>
     <tr>
@@ -603,12 +603,12 @@
       <td>6</td>
     </tr>
     <tr>
-      <td>Cleveland Guardians</td>
+      <td>Miami Marlins</td>
       <td>6</td>
       <td>6</td>
     </tr>
     <tr>
-      <td>Miami Marlins</td>
+      <td>Cleveland Guardians</td>
       <td>6</td>
       <td>6</td>
     </tr>
@@ -616,6 +616,11 @@
       <td>Pittsburgh Pirates</td>
       <td>5</td>
       <td>8</td>
+    </tr>
+    <tr>
+      <td>St. Louis Cardinals</td>
+      <td>5</td>
+      <td>7</td>
     </tr>
     <tr>
       <td>Houston Astros</td>
@@ -626,11 +631,6 @@
       <td>Baltimore Orioles</td>
       <td>5</td>
       <td>8</td>
-    </tr>
-    <tr>
-      <td>St. Louis Cardinals</td>
-      <td>5</td>
-      <td>7</td>
     </tr>
     <tr>
       <td>Minnesota Twins</td>
@@ -662,15 +662,19 @@
       <td>7</td>
     </tr>
     <tr>
-      <td>CLE</td>
-      <td>6</td>
-    </tr>
-    <tr>
       <td>MIA</td>
       <td>6</td>
     </tr>
     <tr>
+      <td>CLE</td>
+      <td>6</td>
+    </tr>
+    <tr>
       <td>PIT</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>STL</td>
       <td>5</td>
     </tr>
     <tr>
@@ -679,10 +683,6 @@
     </tr>
     <tr>
       <td>BAL</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <td>STL</td>
       <td>5</td>
     </tr>
     <tr>
@@ -706,7 +706,7 @@
 
 <div id="TG" class="tabcontent">
     <h2 style="text-align: center;">Today's Games</h2>
-    <table><thead><tr><th>Home Team</th><th>Away Team</th><th>Time</th><th>Odds</th></tr></thead><tbody><td style='color:#e21833'>CLE</td><td style='color:#57068c'>KC</td><td>6:10 PM</td><td>CLE -145</td></tr><td style='color:#57068c'>CIN</td><td style='color:#e21833'>PIT</td><td>6:40 PM</td><td>CIN -165</td></tr><td style='color:#2774AE'>TB</td><td style='color:#2774AE'>ATL</td><td>7:05 PM</td><td>TB -125</td></tr><td style='color:#57068c'>NYY</td><td style='color:#57068c'>SF</td><td>7:05 PM</td><td>NYY -130</td></tr><td style='color:#e21833'>BAL</td><td style='color:#2774AE'>TOR</td><td>7:05 PM</td><td>BAL -120</td></tr><td style='color:#e21833'>MIA</td><td style='color:#2774AE'>WSH</td><td>7:10 PM</td><td>WSH -125</td></tr><td style='color:#2774AE'>CHW</td><td style='color:#57068c'>BOS</td><td>7:40 PM</td><td>BOS -175</td></tr><td style='color:#e21833'>HOU</td><td style='color:#57068c'>LAA</td><td>8:10 PM</td><td>HOU -145</td></tr><td style='color:#e21833'>MIN</td><td style='color:#57068c'>DET</td><td>8:10 PM</td><td>MIN -115</td></tr><td style='color:#e21833'>STL</td><td style='color:#57068c'>PHI</td><td>8:15 PM</td><td>PHI -130</td></tr><td style='color:#2774AE'>SD</td><td style='color:#57068c'>COL</td><td>9:40 PM</td><td>SD -205</td></tr><td style='color:#e21833'>ARI</td><td style='color:#2774AE'>MIL</td><td>9:40 PM</td><td>ARI -165</td></tr><td style='color:#2774AE'>SEA</td><td style='color:#2774AE'>TEX</td><td>9:40 PM</td><td>TEX -130</td></tr><td style='color:#57068c'>ATH</td><td style='color:#e21833'>NYM</td><td>10:05 PM</td><td>NYM -135</td></tr><td style='color:#e21833'>LAD</td><td style='color:#2774AE'>CHC</td><td>10:10 PM</td><td>LAD -200</td></tr></tbody></table>
+    <table><thead><tr><th>Home Team</th><th>Away Team</th><th>Time</th><th>Odds</th></tr></thead><tbody><td style='color:#e21833'>CLE</td><td style='color:#57068c'>KC</td><td>6:10 PM</td><td>CLE -135</td></tr><td style='color:#57068c'>CIN</td><td style='color:#e21833'>PIT</td><td>6:40 PM</td><td>CIN -160</td></tr><td style='color:#2774AE'>TB</td><td style='color:#2774AE'>ATL</td><td>7:05 PM</td><td>TB -125</td></tr><td style='color:#57068c'>NYY</td><td style='color:#57068c'>SF</td><td>7:05 PM</td><td>NYY -130</td></tr><td style='color:#e21833'>BAL</td><td style='color:#2774AE'>TOR</td><td>7:05 PM</td><td>BAL -130</td></tr><td style='color:#e21833'>MIA</td><td style='color:#2774AE'>WSH</td><td>7:10 PM</td><td>MIA -110</td></tr><td style='color:#2774AE'>CHW</td><td style='color:#57068c'>BOS</td><td>7:40 PM</td><td>BOS -165</td></tr><td style='color:#e21833'>HOU</td><td style='color:#57068c'>LAA</td><td>8:10 PM</td><td>HOU -145</td></tr><td style='color:#e21833'>MIN</td><td style='color:#57068c'>DET</td><td>8:10 PM</td><td>MIN -120</td></tr><td style='color:#e21833'>STL</td><td style='color:#57068c'>PHI</td><td>8:15 PM</td><td>PHI -125</td></tr><td style='color:#2774AE'>SD</td><td style='color:#57068c'>COL</td><td>9:40 PM</td><td>SD -200</td></tr><td style='color:#e21833'>ARI</td><td style='color:#2774AE'>MIL</td><td>9:40 PM</td><td>ARI -160</td></tr><td style='color:#2774AE'>SEA</td><td style='color:#2774AE'>TEX</td><td>9:40 PM</td><td>TEX -125</td></tr><td style='color:#57068c'>ATH</td><td style='color:#e21833'>NYM</td><td>10:05 PM</td><td>NYM -135</td></tr><td style='color:#e21833'>LAD</td><td style='color:#2774AE'>CHC</td><td>10:10 PM</td><td>LAD -185</td></tr></tbody></table>
 </div>
 
 <div id="YG" class="tabcontent">
@@ -720,7 +720,7 @@
 <!-- Daily Guessing Game Section with Google Sheets Logging -->
 <div id="daily-guess" style="margin-top: 40px; text-align: center;">
   <h2>Guess the Player!</h2>
-  <img src="image silhouettes/Nelson Cruz_silhouette.jpg" alt="Guess the player" style="max-width: 200px;"><br><br>
+  <img src="image silhouettes/Mark Buehrle_silhouette.jpg" alt="Guess the player" style="max-width: 200px;"><br><br>
   <form id="guess-form" style="display: inline-block;">
     <input type="text" id="guess-input" placeholder="Enter player name" required>
     <button type="submit">Submit</button>
@@ -729,7 +729,7 @@
 </div>
 
 <script>
-  const acceptedAnswers = "Nelson Cruz".toLowerCase().split(",").map(s => s.trim());
+  const acceptedAnswers = "Mark Buehrle".toLowerCase().split(",").map(s => s.trim());
   const loggingEndpoint = "https://script.google.com/macros/s/AKfycbwXxbDt4e46ugPc2WBzeTvMcgbiIvMQWV07rrQv-VCSAJAmu--p6e021rWWU-axwoK9-A/exec";
 
   document.getElementById("guess-form").addEventListener("submit", function(e) {
