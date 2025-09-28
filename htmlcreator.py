@@ -708,14 +708,14 @@ guessing_game_template = '''
 </script>
 '''
 
-guessing_game_html = guessing_game_template.format(
-    player_image_path=player_image_path,
-    answers=answers
-)
+# guessing_game_html = guessing_game_template.format(
+#     player_image_path=player_image_path,
+#     answers=answers
+# )
 
 
-# Append the guessing game HTML to the end of the page
-html_content += guessing_game_html
+# # Append the guessing game HTML to the end of the page
+# html_content += guessing_game_html
 
 yesterday_face_html ='''
 <!-- Yesterday's Face Dropdown Section -->
