@@ -646,18 +646,12 @@ html_content = f"""
 
 <div class="tab">
   <button class="tablinks" onclick="openCity(event, 'TG')">Today's Games</button>
-  <button class="tablinks" onclick="openCity(event, 'YG')">Yesterday's Games</button>
 </div>
 
 
 <div id="TG" class="tabcontent">
     <h2 style="text-align: center;">Today's Games</h2>
-    {html_table}
-</div>
-
-<div id="YG" class="tabcontent">
-  <h2 style="text-align: center;">Yesterday's Games</h2>
-  {html_table_yesterday}
+    {html_table_yesterday}
 </div>
 
 </body>
@@ -666,47 +660,47 @@ html_content = f"""
 
 # === Daily Player Guessing Game Section ===
 # === Daily Player Guessing Game Section (Google Sheets Backend) ===
-guessing_game_template = '''
-<!-- Daily Guessing Game Section with Google Sheets Logging -->
-<div id="daily-guess" style="margin-top: 40px; text-align: center;">
-  <h2>Guess the Player!</h2>
-  <img src="{player_image_path}" alt="Guess the player" style="max-width: 200px;"><br><br>
-  <form id="guess-form" style="display: inline-block;">
-    <input type="text" id="guess-input" placeholder="Enter player name" required>
-    <button type="submit">Submit</button>
-  </form>
-  <p id="feedback" style="margin-top: 10px;"></p>
-</div>
+# guessing_game_template = '''
+# <!-- Daily Guessing Game Section with Google Sheets Logging -->
+# <div id="daily-guess" style="margin-top: 40px; text-align: center;">
+#   <h2>Guess the Player!</h2>
+#   <img src="{player_image_path}" alt="Guess the player" style="max-width: 200px;"><br><br>
+#   <form id="guess-form" style="display: inline-block;">
+#     <input type="text" id="guess-input" placeholder="Enter player name" required>
+#     <button type="submit">Submit</button>
+#   </form>
+#   <p id="feedback" style="margin-top: 10px;"></p>
+# </div>
 
-<script>
-  const acceptedAnswers = "{answers}".toLowerCase().split(",").map(s => s.trim());
-  const loggingEndpoint = "https://script.google.com/macros/s/AKfycbwXxbDt4e46ugPc2WBzeTvMcgbiIvMQWV07rrQv-VCSAJAmu--p6e021rWWU-axwoK9-A/exec";
+# <script>
+#   const acceptedAnswers = "{answers}".toLowerCase().split(",").map(s => s.trim());
+#   const loggingEndpoint = "https://script.google.com/macros/s/AKfycbwXxbDt4e46ugPc2WBzeTvMcgbiIvMQWV07rrQv-VCSAJAmu--p6e021rWWU-axwoK9-A/exec";
 
-  document.getElementById("guess-form").addEventListener("submit", function(e) {{
-    e.preventDefault();
-    const guessInput = document.getElementById("guess-input");
-    const userGuess = guessInput.value.trim();
-    const userGuessLower = userGuess.toLowerCase();
-    const feedback = document.getElementById("feedback");
+#   document.getElementById("guess-form").addEventListener("submit", function(e) {{
+#     e.preventDefault();
+#     const guessInput = document.getElementById("guess-input");
+#     const userGuess = guessInput.value.trim();
+#     const userGuessLower = userGuess.toLowerCase();
+#     const feedback = document.getElementById("feedback");
 
-    const isCorrect = acceptedAnswers.includes(userGuessLower);
-    feedback.textContent = isCorrect ? "✅ Correct!" : "❌ Incorrect. Try again!";
-    feedback.style.color = isCorrect ? "green" : "red";
+#     const isCorrect = acceptedAnswers.includes(userGuessLower);
+#     feedback.textContent = isCorrect ? "✅ Correct!" : "❌ Incorrect. Try again!";
+#     feedback.style.color = isCorrect ? "green" : "red";
 
-    // Log guess (only guess — timestamp is created server-side)
-    fetch(loggingEndpoint, {{
-      method: "POST",
-      mode: "no-cors",
-      headers: {{
-        "Content-Type": "application/x-www-form-urlencoded"
-      }},
-      body: new URLSearchParams({{
-        guess: userGuess
-      }})
-    }});
-  }});
-</script>
-'''
+#     // Log guess (only guess — timestamp is created server-side)
+#     fetch(loggingEndpoint, {{
+#       method: "POST",
+#       mode: "no-cors",
+#       headers: {{
+#         "Content-Type": "application/x-www-form-urlencoded"
+#       }},
+#       body: new URLSearchParams({{
+#         guess: userGuess
+#       }})
+#     }});
+#   }});
+# </script>
+# '''
 
 # guessing_game_html = guessing_game_template.format(
 #     player_image_path=player_image_path,
@@ -717,38 +711,38 @@ guessing_game_template = '''
 # # Append the guessing game HTML to the end of the page
 # html_content += guessing_game_html
 
-yesterday_face_html ='''
-<!-- Yesterday's Face Dropdown Section -->
-<details style="margin-top: 40px; text-align: center;">
-  <summary style="font-size: 1.2em;">Yesterday's Face</summary>
-  <div style="margin-top: 20px; display: flex; justify-content: center; gap: 40px;">
-    <div>
-      <img src="{yesterday_silhouette_image}" alt="Silhouette" style="max-width: 200px;"><br>
-    </div>
-    <div>
-      <img src="{yesterday_image}" alt="Full Image" style="max-width: 200px;"><br>
-    </div>
-  </div>
-  <p style="margin-top: 10px;"><strong>{yesterday_player_name}</strong></p>
-</details>
-'''
+# yesterday_face_html ='''
+# <!-- Yesterday's Face Dropdown Section -->
+# <details style="margin-top: 40px; text-align: center;">
+#   <summary style="font-size: 1.2em;">Yesterday's Face</summary>
+#   <div style="margin-top: 20px; display: flex; justify-content: center; gap: 40px;">
+#     <div>
+#       <img src="{yesterday_silhouette_image}" alt="Silhouette" style="max-width: 200px;"><br>
+#     </div>
+#     <div>
+#       <img src="{yesterday_image}" alt="Full Image" style="max-width: 200px;"><br>
+#     </div>
+#   </div>
+#   <p style="margin-top: 10px;"><strong>{yesterday_player_name}</strong></p>
+# </details>
+# '''
 
-yesterday = date.today()-pd.Timedelta(days=1)
-yesterday = yesterday.strftime("%Y-%m-%d")
-row = schedule_df[schedule_df["date"] == yesterday]
+# yesterday = date.today()-pd.Timedelta(days=1)
+# yesterday = yesterday.strftime("%Y-%m-%d")
+# row = schedule_df[schedule_df["date"] == yesterday]
 
-# Extract data
-yesterday_player_name = row.iloc[0]["player_name"]
-yesterday_silhouette_image = "image silhouettes/"+yesterday_player_name+"_silhouette.jpg"
-yesterday_image = "images/"+yesterday_player_name+".jpg"
-print(yesterday_silhouette_image)
-yesterday_face_html = yesterday_face_html.format(
-    yesterday_silhouette_image=yesterday_silhouette_image,
-    yesterday_image=yesterday_image,
-    yesterday_player_name=yesterday_player_name
-)
+# # Extract data
+# yesterday_player_name = row.iloc[0]["player_name"]
+# yesterday_silhouette_image = "image silhouettes/"+yesterday_player_name+"_silhouette.jpg"
+# yesterday_image = "images/"+yesterday_player_name+".jpg"
+# print(yesterday_silhouette_image)
+# yesterday_face_html = yesterday_face_html.format(
+#     yesterday_silhouette_image=yesterday_silhouette_image,
+#     yesterday_image=yesterday_image,
+#     yesterday_player_name=yesterday_player_name
+# )
 
-html_content += yesterday_face_html
+# html_content += yesterday_face_html
 
 # Write HTML content to a file
 with open('index.html', 'w') as f:
