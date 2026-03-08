@@ -277,7 +277,7 @@ html_content = f"""
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MLB Standings</title>
+    <title>NBA Standings</title>
     <script >
         function openCity(evt, cityName) {{
         // Declare all variables
@@ -502,7 +502,7 @@ html_content = f"""
 
     <script>
         let x = {chaseWins+ bryceWins + zachWins}
-        let y = {30*81}
+        let y = {1230}
         let percentage = ((x / y) * 100).toFixed(1);
 
         let progressBar = document.getElementById("progressBar");
@@ -646,12 +646,18 @@ html_content = f"""
 
 <div class="tab">
   <button class="tablinks" onclick="openCity(event, 'TG')">Today's Games</button>
+  <button class="tablinks" onclick="openCity(event, 'YG')">Yesterday's Games</button>
 </div>
 
 
 <div id="TG" class="tabcontent">
     <h2 style="text-align: center;">Today's Games</h2>
-    {html_table_yesterday}
+    {html_table}
+</div>
+
+<div id="YG" class="tabcontent">
+  <h2 style="text-align: center;">Yesterday's Games</h2>
+  {html_table_yesterday}
 </div>
 
 </body>

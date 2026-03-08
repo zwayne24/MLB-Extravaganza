@@ -55,9 +55,10 @@ for team in soup.find_all('tr', class_='filled Table__TR Table__TR--sm Table__ev
         standings = pd.concat([standings, new_row], ignore_index=True)
     i += 1
 
-ChasesTeams = ['Atlanta Braves', 'Texas Rangers', 'Chicago Cubs', 'San Diego Padres', 'Seattle Mariners', 'Milwaukee Brewers', 'Tampa Bay Rays', 'Toronto Blue Jays', 'Washington Nationals', 'Chicago White Sox']
-BrycesTeams = ['New York Yankees', 'Philadelphia Phillies', 'Boston Red Sox', 'Detroit Tigers', 'Kansas City Royals', 'San Francisco Giants', 'Cincinnati Reds', 'Los Angeles Angels', 'Athletics', 'Colorado Rockies']
-ZachsTeams = ['New York Mets', 'Los Angeles Dodgers', 'Houston Astros', 'Baltimore Orioles', 'Arizona Diamondbacks', 'Minnesota Twins', 'Cleveland Guardians', 'Pittsburgh Pirates', 'St. Louis Cardinals', 'Miami Marlins']
+ChasesTeams = ['Toronto Blue Jays', 'Seattle Mariners', 'Boston Red Sox', 'Baltimore Orioles', 'San Diego Padres', 'Kansas City Royals', 'Arizona Diamondbacks', 'Miami Marlins', 'Minnesota Twins', 'St. Louis Cardinals']
+BrycesTeams = ['Los Angeles Dodgers', 'Philadelphia Phillies', 'Detroit Tigers', 'San Francisco Giants', 'Cleveland Guardians', 'Cincinnati Reds', 'Pittsburgh Pirates', 'Los Angeles Angels', 'Chicago White Sox', 'Colorado Rockies']
+ZachsTeams = ['New York Yankees', 'New York Mets', 'Chicago Cubs', 'Atlanta Braves', 'Houston Astros', 'Milwaukee Brewers', 'Texas Rangers', 'Tampa Bay Rays', 'Athletics', 'Washington Nationals']
+
 
 # Process standings data
 standings['W'] = standings['W'].astype(int)
@@ -90,9 +91,9 @@ chaseStandingsMobile = chaseStandingsMobile[['Team', 'W']]
 bryceStandingsMobile = bryceStandingsMobile[['Team', 'W']]
 zachStandingsMobile = zachStandingsMobile[['Team', 'W']]
 
-# add 'Athletics' to Bryce Standings
-brycesStandings = brycesStandings.append({'Team': 'Athletics', 'W': 0, 'L': 0, 'PCT': 0}, ignore_index=True)
-bryceStandingsMobile = bryceStandingsMobile.append({'Team': 'ATH', 'W': 0}, ignore_index=True)
+# add 'Athletics' to Zach Standings
+zachsStandings = zachsStandings.append({'Team': 'Athletics', 'W': 0, 'L': 0, 'PCT': 0}, ignore_index=True)
+zachStandingsMobile = zachStandingsMobile.append({'Team': 'ATH', 'W': 0}, ignore_index=True)
 # change 'W' and 'L' in standings to 0
 chasesStandings['W'] = 0
 brycesStandings['W'] = 0
@@ -112,74 +113,9 @@ chaseWins = chasesStandings['W'].sum()
 bryceWins = brycesStandings['W'].sum()
 zachWins = zachsStandings['W'].sum()
 
-url = 'https://www.espn.com/mlb/schedule/_/date/20250319'
-headers = {
-    'User-Agent': 'Mozilla/5.0'
-}
-response = requests.get(url, headers=headers)
-soup = BeautifulSoup(response.text, 'html.parser')
-
-# Locate the schedule table
-matchups = []
-yesterday = []
-schedule_table = soup.find_all('div', class_='ScheduleTables')[1]
-yesterday_table = soup.find_all('div', class_='ScheduleTables')[0]
-
-if schedule_table:
-    # Find each matchup row
-    rows = schedule_table.find_all('tr', class_='Table__TR--sm')
-
-    for row in rows:
-        # Extract team names
-        teams = row.find_all('a', class_='AnchorLink')
-        away_team = teams[1]['href'].split('/')[-2] if teams else None
-        home_team = teams[3]['href'].split('/')[-2] if len(teams) > 1 else None
-        # Extract time
-        time = row.find('td', class_='date__col').text.strip() if row.find('td', class_='date__col') else None
-        
-        # Extract odds (e.g., point spread)
-        odds_info = row.find('div', class_='Odds__Message')
-        odds = odds_info.text.strip() if odds_info else None
-
-        # Store each matchup as a dictionary
-        matchups.append({
-            'away_team': away_team,
-            'home_team': home_team,
-            'time': time,
-            'odds': odds.split('O/U')[0].split('Line: ')[1] if odds else None,
-        })
-
-# Create a DataFrame from the matchups list
-matchups_df = pd.DataFrame(matchups)
-html_table = "<table><thead><tr><th>Home Team</th><th>Away Team</th><th>Time</th><th>Odds</th></tr></thead><tbody>"
-for i, row in matchups_df.iterrows():
-    # if row['Home Team'] = ChasesTeams first row
-    for team in ChasesTeams:
-        team = teamToAbbr[team]
-        if row['home_team'] == team.lower():
-            html_table += f"<td style='color:#2774AE'>{team}</td>"
-    for team in BrycesTeams:
-        team = teamToAbbr[team]
-        if row['home_team'] == team.lower():
-            html_table += f"<td style='color:#57068c'>{team}</td>"
-    for team in ZachsTeams:
-        team = teamToAbbr[team]
-        if row['home_team'] == team.lower():
-            html_table += f"<td style='color:#e21833'>{team}</td>"
-    for team in ChasesTeams:
-        team = teamToAbbr[team]
-        if row['away_team'] == team.lower():
-            html_table += f"<td style='color:#2774AE'>{team}</td>"
-    for team in BrycesTeams:
-        team = teamToAbbr[team]
-        if row['away_team'] == team.lower():
-            html_table += f"<td style='color:#57068c'>{team}</td>"
-    for team in ZachsTeams:
-        team = teamToAbbr[team]
-        if row['away_team'] == team.lower():
-            html_table += f"<td style='color:#e21833'>{team}</td>"
-    html_table += f"<td>{row['time']}</td><td>{row['odds']}</td></tr>"
-html_table += "</tbody></table>"
+html_table = """<table><thead><tr><th>Home Team</th><th>Away Team</th><th>Time</th><th>Odds</th></tr></thead><tbody>
+<tr><td style='color:#57068c'>SF</td><td style='color:#e21833'>NYY</td><td>8:05 PM</td><td>NYY -117</td></tr>
+</tbody></table>"""
 
 df = pd.read_excel('Wins_Over_Time.xlsx') 
 df.iloc[:, 1:] = df.iloc[:, 1:].sub(df.iloc[:, 1:].min(axis=1), axis=0)
@@ -216,194 +152,395 @@ html_content = f"""
     }}
     </script>
     <style>
-    /* Existing styles */
+    * {{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }}
+
     body {{
-        font-family: Arial, sans-serif;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #77B5FE 0%, #4d94e8 100%);
+        min-height: 100vh;
+        padding: 20px;
     }}
 
     h1 {{
         text-align: center;
-        color: Green;
-        font-size: 60px;
+        color: #ffffff;
+        font-size: 48px;
+        margin: 20px 0;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        font-weight: 700;
+        letter-spacing: 2px;
+    }}
+
+    h2 {{
+        color: #333;
+        font-weight: 600;
+    }}
+
+    h3 {{
+        color: #555;
+        font-size: 28px;
+        margin: 20px 0 15px 0;
+        font-weight: 600;
     }}
 
     table {{
         margin: 0 auto;
-        width: 50%;
+        width: 100%;
         border-collapse: collapse;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
     }}
 
     th, td {{
-        padding: 10px;
+        padding: 14px 16px;
         text-align: center;
-        border: 1px solid black;
+        font-size: 16px;
+    }}
+
+    th {{
+        background: linear-gradient(135deg, #7B77FE 0%, #5450d4 100%);
+        color: white;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 14px;
+        letter-spacing: 1px;
+    }}
+
+    td {{
+        border-bottom: 1px solid #f0f0f0;
     }}
 
     img {{
         display: block;
         margin: 0 auto;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        height: 120px;
+        width: auto;
     }}
 
-    .column {{
-        float: left;
-        width: 33.33%;
-        text-align: center;
-    }}
-
-    .row:after {{
-        content: "";
-        display: table;
-        clear: both;
-    }}
-
-    /* New styles */
     .row {{
         display: flex;
         justify-content: space-around;
-        margin-top: 20px;
+        margin-top: 30px;
+        gap: 20px;
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
     }}
 
     .column {{
         flex: 1;
-        padding: 15px;
+        padding: 0;
+        min-width: 0;
     }}
 
     .card {{
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        background-color: #f9f9f9;
-        padding: 20px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        padding: 30px;
         text-align: center;
+        height: 100%;
     }}
 
     .card-header {{
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }}
 
     .card-body h2 {{
-        font-size: 24px;
+        font-size: 32px;
         color: #333;
-        margin: 10px 0;
+        margin: 15px 0;
+        font-weight: 700;
     }}
 
     .table-container {{
-        margin-top: 15px;
+        margin-top: 20px;
         overflow-x: auto;
+        border-radius: 8px;
     }}
-    
+
     .table-container2 {{
         margin-top: 0px;
         overflow-x: visible;
         font-size: 12px;
     }}
 
-    table {{
-        width: 100%;
-        border-collapse: collapse;
+    .table-container table,
+    .table-container2 table {{
+        border-radius: 8px;
+        overflow: hidden;
     }}
 
-    table, th, td {{
-        border: 1px solid #ccc;
-        padding: 10px;
-    }}
-
-    th {{
-        background-color: #f2f2f2;
-        color: #333;
-        font-weight: bold;
-    }}
-
-    td {{
-        text-align: center;
-    }}
-    
     #myLineChart {{
         width: 100%;
+        max-width: 600px;
+        margin: 20px auto;
     }}
-    
+
     .progress-container {{
-            width: 100%;
-            background-color: #f1f1f1;
-            border-radius: 5px;
-            position: relative;
+        width: 100%;
+        max-width: 1400px;
+        margin: 0 auto 20px auto;
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 50px;
+        position: relative;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }}
 
     .progress-bar {{
-        height: 30px;
-        background-color: #4CAF50;
+        height: 40px;
+        background: linear-gradient(90deg, #7B77FE 0%, #5450d4 100%);
         text-align: center;
-        color: black;
-        line-height: 30px;
-        border-radius: 5px;
+        color: white;
+        line-height: 40px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 16px;
+        transition: width 0.5s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }}
-    
+
+    .tab {{
+        overflow: hidden;
+        background: white;
+        text-align: center;
+        max-width: 1400px;
+        margin: 30px auto;
+        border-radius: 50px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        padding: 5px;
+    }}
+
+    .tab button {{
+        background-color: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 14px 30px;
+        transition: all 0.3s;
+        font-size: 16px;
+        font-weight: 600;
+        color: #666;
+        border-radius: 50px;
+        margin: 0 5px;
+    }}
+
+    .tab button:hover {{
+        background: linear-gradient(135deg, #7B77FE 0%, #5450d4 100%);
+        color: white;
+    }}
+
+    .tab button.active {{
+        background: linear-gradient(135deg, #7B77FE 0%, #5450d4 100%);
+        color: white;
+        box-shadow: 0 3px 10px rgba(119, 181, 254, 0.4);
+    }}
+
+    .tabcontent {{
+        display: none;
+        padding: 30px;
+        background: white;
+        border-radius: 20px;
+        max-width: 1400px;
+        margin: 20px auto;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }}
+
+    .tabcontent h2 {{
+        color: #333;
+        margin-bottom: 20px;
+        font-weight: 700;
+    }}
+
+    hr {{
+        border: none;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, currentColor, transparent);
+        margin: 15px 0;
+    }}
+
+    .standings-table {{
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        margin: 20px auto;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }}
+
+    .standings-table th {{
+        background: linear-gradient(135deg, #7B77FE 0%, #5450d4 100%);
+        padding: 14px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: white;
+    }}
+
+    .standings-table td {{
+        padding: 14px 16px;
+        font-weight: 600;
+        font-size: 16px;
+    }}
+
+    .daily-overview-title {{
+        color: white;
+        padding: 5px;
+        text-align: center;
+        margin: 5px auto;
+        max-width: 1400px;
+        font-weight: 700;
+    }}
+
     @media screen and (max-width: 600px) {{
         .column {{
-            flex: 100%; /* Make each column take up full width */
-            padding: 0px;
+            flex: 1;
+            padding: 3px;
+            min-width: 0;
         }}
-        
+
+        .row {{
+            flex-direction: row;
+            gap: 3px;
+            margin-top: 15px;
+        }}
+
         .table-container {{
             display: none;
         }}
-        
+
         .table-container2 {{
-            display: "block";
+            display: block;
+        }}
+
+        .table-container2 table {{
+            font-size: 12px;
+        }}
+
+        .table-container2 th,
+        .table-container2 td {{
+            padding: 8px 4px;
+        }}
+
+        .table-container2 th {{
+            font-size: 11px;
+        }}
+
+        h1 {{
+            font-size: 28px;
+            margin: 10px 0;
+            letter-spacing: 1px;
+        }}
+
+        .card {{
+            padding: 10px;
+            border-radius: 12px;
+        }}
+
+        .card-body h2 {{
+            font-size: 20px;
+            margin: 8px 0;
+            font-weight: 700;
+        }}
+
+        .card-header {{
+            margin-bottom: 10px;
+        }}
+
+        .card-header img {{
+            height: 90px;
+            width: auto;
+        }}
+
+        hr {{
+            margin: 8px 0;
+            height: 2px;
+        }}
+
+        .tab button {{
+            padding: 10px 15px;
+            font-size: 13px;
+        }}
+
+        body {{
+            padding: 8px;
+        }}
+
+        .progress-bar {{
+            height: 32px;
+            line-height: 32px;
+            font-size: 13px;
+        }}
+
+        .progress-container {{
+            margin-bottom: 15px;
+        }}
+
+        .tabcontent {{
+            padding: 15px;
+        }}
+
+        tr:hover td {{
+            background-color: transparent;
+        }}
+
+        .daily-overview-title {{
+            font-size: 20px;
+            margin: 10px auto;
+        }}
+
+        .standings-table {{
+            font-size: 14px;
+        }}
+
+        .standings-table th {{
+            font-size: 12px;
+            padding: 10px 5px;
+        }}
+
+        .standings-table td {{
+            font-size: 14px;
+            padding: 8px 4px;
         }}
     }}
-    
-        /* Style the tab */
-    .tab {{
-    overflow: hidden;
-    border: 1px solid #ccc;
-    background-color: #f1f1f1;
-    text-align: center;
-    }}
 
-    /* Style the buttons that are used to open the tab content */
-    .tab button {{
-    background-color: inherit;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    padding: 14px 16px;
-    transition: 0.3s;
-    }}
-
-    /* Change background color of buttons on hover */
-    .tab button:hover {{
-    background-color: #ddd;
-    }}
-
-    /* Create an active/current tablink class */
-    .tab button.active {{
-    background-color: #ccc;
-    }}
-
-    /* Style the tab content */
-    .tabcontent {{
-    display: none;
-    padding: 6px 12px;
-    border: 1px solid #ccc;
-    border-top: none;
-    }}
-    
     @media screen and (min-width: 601px) {{
         .table-container2 {{
             display: none;
         }}
+    }}
+
+    ch {{
+        text-decoration: underline;
+        -webkit-text-decoration-color: red;
+        text-decoration-color: red;
+        font-size: 24px;
+        font-weight: bold;
+    }}
+
+    /* Chart container styling */
+    #chart-container {{
+        background: white;
+        border-radius: 20px;
+        padding: 10px;
+        margin: 10px auto;
+        max-width: 95%;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }}
+
+    @media screen and (min-width: 601px) {{
         #chart-container {{
             display: none;
         }}
-    }}
-    
-    ch {{
-        text-decoration: underline;
-        -webkit-text-decoration-color: red; /* safari still uses vendor prefix */
-        text-decoration-color: red;
-        font-size: 24px;
-        font-weight:bold;
     }}
 
 </style>
@@ -507,10 +644,10 @@ html_content = f"""
         <div class="card">
             <div class="card-header">
                 {img_to_html('photos/ChaseHead.png')}
+                <hr style="background: #2774AE; background-image: none; height: 3px; border: none; margin: 15px 0;"/>
             </div>
-            <hr color="#2774AE">
             <div class="card-body">
-                <h2>Chase's Wins: {chaseWins}</h2>
+                <h2>Chase's Wins: <br>{chaseWins}</h2>
                 <div class="table-container">
                     {chasesStandings.to_html(index=False)}
                 </div>
@@ -525,10 +662,10 @@ html_content = f"""
         <div class="card">
             <div class="card-header">
                 {img_to_html('photos/BryceHead.png')}
+                <hr style="background: #57068c; background-image: none; height: 3px; border: none; margin: 15px 0;"/>
             </div>
-            <hr color="#57068c">
             <div class="card-body">
-                <h2>Bryce's Wins: {bryceWins}</h2>
+                <h2>Bryce's Wins: <br>{bryceWins}</h2>
                 <div class="table-container">
                     {brycesStandings.to_html(index=False)}
                 </div>
@@ -543,10 +680,10 @@ html_content = f"""
         <div class="card">
             <div class="card-header">
                 {img_to_html('photos/ZachHead.png')}
+                <hr style="background: #e21833; background-image: none; height: 3px; border: none; margin: 15px 0;"/>
             </div>
-            <hr color="#e21833">
             <div class="card-body">
-                <h2>Zach's Wins: {zachWins}</h2>
+                <h2>Zach's Wins: <br>{zachWins}</h2>
                 <div class="table-container" >
                     {zachsStandings.to_html(index=False)}
                 </div>
@@ -557,7 +694,6 @@ html_content = f"""
         </div>
     </div>
 </div>
-<hr/>
 
 <div class="tab">
   <button class="tablinks" onclick="openCity(event, 'TG')">Today's Games</button>
