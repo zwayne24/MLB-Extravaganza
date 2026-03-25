@@ -1,26 +1,3 @@
-"""
-HTML Creator Script with Daily Guessing Game Feature
-"""
-
-# === Original Imports ===
-import pandas as pd
-from datetime import date
-import datetime
-
-# === Load Player of the Day Info ===
-schedule_df = pd.read_excel("player_schedule.xlsx")
-today_str = date.today().strftime("%Y-%m-%d")
-row = schedule_df[schedule_df["date"] == today_str]
-
-if not row.empty:
-    player_image_path = row.iloc[0]["image_path"]
-    player_name = row.iloc[0]["player_name"]
-    answers = row.iloc[0]["Answers"]
-else:
-    player_image_path = "images/default.jpg"
-    player_name = "Unknown"
-
-# === Original HTML Creation Logic ===
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -78,9 +55,9 @@ for team in soup.find_all('tr', class_='filled Table__TR Table__TR--sm Table__ev
         standings = pd.concat([standings, new_row], ignore_index=True)
     i += 1
 
-ChasesTeams = ['Atlanta Braves', 'Texas Rangers', 'Chicago Cubs', 'San Diego Padres', 'Seattle Mariners', 'Milwaukee Brewers', 'Tampa Bay Rays', 'Toronto Blue Jays', 'Washington Nationals', 'Chicago White Sox']
-BrycesTeams = ['New York Yankees', 'Philadelphia Phillies', 'Boston Red Sox', 'Detroit Tigers', 'Kansas City Royals', 'San Francisco Giants', 'Cincinnati Reds', 'Los Angeles Angels', 'Athletics', 'Colorado Rockies']
-ZachsTeams = ['New York Mets', 'Los Angeles Dodgers', 'Houston Astros', 'Baltimore Orioles', 'Arizona Diamondbacks', 'Minnesota Twins', 'Cleveland Guardians', 'Pittsburgh Pirates', 'St. Louis Cardinals', 'Miami Marlins']
+ChasesTeams = ['Toronto Blue Jays', 'Seattle Mariners', 'Boston Red Sox', 'Baltimore Orioles', 'San Diego Padres', 'Kansas City Royals', 'Arizona Diamondbacks', 'Miami Marlins', 'Minnesota Twins', 'St. Louis Cardinals']
+BrycesTeams = ['Los Angeles Dodgers', 'Philadelphia Phillies', 'Detroit Tigers', 'San Francisco Giants', 'Cleveland Guardians', 'Cincinnati Reds', 'Pittsburgh Pirates', 'Los Angeles Angels', 'Chicago White Sox', 'Colorado Rockies']
+ZachsTeams = ['New York Yankees', 'New York Mets', 'Chicago Cubs', 'Atlanta Braves', 'Houston Astros', 'Milwaukee Brewers', 'Texas Rangers', 'Tampa Bay Rays', 'Athletics', 'Washington Nationals']
 
 # Process standings data
 standings['W'] = standings['W'].astype(int)
@@ -120,10 +97,11 @@ zachWins = zachsStandings['W'].sum()
 
 df = pd.read_excel('Wins_Over_Time.xlsx') 
 # add on to end of dataframe with todays data and wins
-todaysData = pd.DataFrame({'Day': date.today()-pd.Timedelta(days=1), 'Chase': [chaseWins], 'Bryce': [bryceWins], 'Zach': [zachWins]})  
-df = pd.concat([df, todaysData], ignore_index=True)
-# save to excel
-df.to_excel('Wins_Over_Time.xlsx', index=False)
+target_day = date.today() - pd.Timedelta(days=1)
+if pd.to_datetime(target_day) not in pd.to_datetime(df['Day']).values:
+    todaysData = pd.DataFrame({'Day': [target_day], 'Chase': [chaseWins], 'Bryce': [bryceWins], 'Zach': [zachWins]})
+    df = pd.concat([df, todaysData], ignore_index=True)
+    df.to_excel('Wins_Over_Time.xlsx', index=False)
 df.iloc[:, 1:] = df.iloc[:, 1:].sub(df.iloc[:, 1:].min(axis=1), axis=0)
 # format dat as Oct-22
 df['Day'] = pd.to_datetime(df['Day']).dt.strftime('%b-%d')
@@ -277,7 +255,7 @@ html_content = f"""
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBA Standings</title>
+    <title>MLB Standings</title>
     <script >
         function openCity(evt, cityName) {{
         // Declare all variables
@@ -301,179 +279,367 @@ html_content = f"""
     }}
     </script>
     <style>
-    /* Existing styles */
+    * {{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }}
+
     body {{
-        font-family: Arial, sans-serif;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #77B5FE 0%, #4d94e8 100%);
+        min-height: 100vh;
+        padding: 20px;
     }}
 
     h1 {{
         text-align: center;
-        color: Green;
-        font-size: 60px;
+        color: #ffffff;
+        font-size: 48px;
+        margin: 20px 0;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        font-weight: 700;
+        letter-spacing: 2px;
+    }}
+
+    h2 {{
+        color: #333;
+        font-weight: 600;
+    }}
+
+    h3 {{
+        color: #555;
+        font-size: 28px;
+        margin: 20px 0 15px 0;
+        font-weight: 600;
     }}
 
     table {{
         margin: 0 auto;
-        width: 50%;
+        width: 100%;
         border-collapse: collapse;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
     }}
 
     th, td {{
-        padding: 10px;
+        padding: 14px 16px;
         text-align: center;
-        border: 1px solid black;
+        font-size: 16px;
+    }}
+
+    th {{
+        background: linear-gradient(135deg, #7B77FE 0%, #5450d4 100%);
+        color: white;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 14px;
+        letter-spacing: 1px;
+    }}
+
+    td {{
+        border-bottom: 1px solid #f0f0f0;
     }}
 
     img {{
         display: block;
         margin: 0 auto;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        height: 120px;
+        width: auto;
     }}
 
-    .column {{
-        float: left;
-        width: 33.33%;
-        text-align: center;
-    }}
-
-    .row:after {{
-        content: "";
-        display: table;
-        clear: both;
-    }}
-
-    /* New styles */
     .row {{
         display: flex;
         justify-content: space-around;
-        margin-top: 20px;
+        margin-top: 30px;
+        gap: 20px;
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
     }}
 
     .column {{
         flex: 1;
-        padding: 15px;
+        padding: 0;
+        min-width: 0;
     }}
 
     .card {{
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        background-color: #f9f9f9;
-        padding: 20px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        padding: 30px;
         text-align: center;
+        height: 100%;
     }}
 
     .card-header {{
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }}
 
     .card-body h2 {{
-        font-size: 24px;
+        font-size: 32px;
         color: #333;
-        margin: 10px 0;
+        margin: 15px 0;
+        font-weight: 700;
     }}
 
     .table-container {{
-        margin-top: 15px;
+        margin-top: 20px;
         overflow-x: auto;
+        border-radius: 8px;
     }}
-    
+
     .table-container2 {{
         margin-top: 0px;
         overflow-x: visible;
         font-size: 12px;
     }}
 
-    table {{
-        width: 100%;
-        border-collapse: collapse;
+    .table-container table,
+    .table-container2 table {{
+        border-radius: 8px;
+        overflow: hidden;
     }}
 
-    table, th, td {{
-        border: 1px solid #ccc;
-        padding: 10px;
-    }}
-
-    th {{
-        background-color: #f2f2f2;
-        color: #333;
-        font-weight: bold;
-    }}
-
-    td {{
-        text-align: center;
-    }}
-    
     #myLineChart {{
         width: 100%;
+        max-width: 600px;
+        margin: 20px auto;
     }}
-    
+
     .progress-container {{
-            width: 100%;
-            background-color: #f1f1f1;
-            border-radius: 5px;
-            position: relative;
+        width: 100%;
+        max-width: 1400px;
+        margin: 0 auto 20px auto;
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 50px;
+        position: relative;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }}
 
     .progress-bar {{
-        height: 30px;
-        background-color: #4CAF50;
+        height: 40px;
+        background: linear-gradient(90deg, #7B77FE 0%, #5450d4 100%);
         text-align: center;
-        color: black;
-        line-height: 30px;
-        border-radius: 5px;
+        color: white;
+        line-height: 40px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 16px;
+        transition: width 0.5s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }}
-    
+
+    .tab {{
+        overflow: hidden;
+        background: white;
+        text-align: center;
+        max-width: 1400px;
+        margin: 30px auto;
+        border-radius: 50px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        padding: 5px;
+    }}
+
+    .tab button {{
+        background-color: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 14px 30px;
+        transition: all 0.3s;
+        font-size: 16px;
+        font-weight: 600;
+        color: #666;
+        border-radius: 50px;
+        margin: 0 5px;
+    }}
+
+    .tab button:hover {{
+        background: linear-gradient(135deg, #7B77FE 0%, #5450d4 100%);
+        color: white;
+    }}
+
+    .tab button.active {{
+        background: linear-gradient(135deg, #7B77FE 0%, #5450d4 100%);
+        color: white;
+        box-shadow: 0 3px 10px rgba(119, 181, 254, 0.4);
+    }}
+
+    .tabcontent {{
+        display: none;
+        padding: 30px;
+        background: white;
+        border-radius: 20px;
+        max-width: 1400px;
+        margin: 20px auto;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }}
+
+    .tabcontent h2 {{
+        color: #333;
+        margin-bottom: 20px;
+        font-weight: 700;
+    }}
+
+    hr {{
+        border: none;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, currentColor, transparent);
+        margin: 15px 0;
+    }}
+
+    .standings-table {{
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        margin: 20px auto;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }}
+
+    .standings-table th {{
+        background: linear-gradient(135deg, #7B77FE 0%, #5450d4 100%);
+        padding: 14px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: white;
+    }}
+
+    .standings-table td {{
+        padding: 14px 16px;
+        font-weight: 600;
+        font-size: 16px;
+    }}
+
+    .daily-overview-title {{
+        color: white;
+        padding: 5px;
+        text-align: center;
+        margin: 5px auto;
+        max-width: 1400px;
+        font-weight: 700;
+    }}
+
     @media screen and (max-width: 600px) {{
         .column {{
-            flex: 100%; /* Make each column take up full width */
-            padding: 0px;
+            flex: 1;
+            padding: 3px;
+            min-width: 0;
         }}
-        
+
+        .row {{
+            flex-direction: row;
+            gap: 3px;
+            margin-top: 15px;
+        }}
+
         .table-container {{
             display: none;
         }}
-        
+
         .table-container2 {{
-            display: "block";
+            display: block;
+        }}
+
+        .table-container2 table {{
+            font-size: 12px;
+        }}
+
+        .table-container2 th,
+        .table-container2 td {{
+            padding: 8px 4px;
+        }}
+
+        .table-container2 th {{
+            font-size: 11px;
+        }}
+
+        h1 {{
+            font-size: 28px;
+            margin: 10px 0;
+            letter-spacing: 1px;
+        }}
+
+        .card {{
+            padding: 10px;
+            border-radius: 12px;
+        }}
+
+        .card-body h2 {{
+            font-size: 20px;
+            margin: 8px 0;
+            font-weight: 700;
+        }}
+
+        .card-header {{
+            margin-bottom: 10px;
+        }}
+
+        .card-header img {{
+            height: 90px;
+            width: auto;
+        }}
+
+        hr {{
+            margin: 8px 0;
+            height: 2px;
+        }}
+
+        .tab button {{
+            padding: 10px 15px;
+            font-size: 13px;
+        }}
+
+        body {{
+            padding: 8px;
+        }}
+
+        .progress-bar {{
+            height: 32px;
+            line-height: 32px;
+            font-size: 13px;
+        }}
+
+        .progress-container {{
+            margin-bottom: 15px;
+        }}
+
+        .tabcontent {{
+            padding: 15px;
+        }}
+
+        tr:hover td {{
+            background-color: transparent;
+        }}
+
+        .daily-overview-title {{
+            font-size: 20px;
+            margin: 10px auto;
+        }}
+
+        .standings-table {{
+            font-size: 14px;
+        }}
+
+        .standings-table th {{
+            font-size: 12px;
+            padding: 10px 5px;
+        }}
+
+        .standings-table td {{
+            font-size: 14px;
+            padding: 8px 4px;
         }}
     }}
-    
-        /* Style the tab */
-    .tab {{
-    overflow: hidden;
-    border: 1px solid #ccc;
-    background-color: #f1f1f1;
-    text-align: center;
-    }}
 
-    /* Style the buttons that are used to open the tab content */
-    .tab button {{
-    background-color: inherit;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    padding: 14px 16px;
-    transition: 0.3s;
-    }}
-
-    /* Change background color of buttons on hover */
-    .tab button:hover {{
-    background-color: #ddd;
-    }}
-
-    /* Create an active/current tablink class */
-    .tab button.active {{
-    background-color: #ccc;
-    }}
-
-    /* Style the tab content */
-    .tabcontent {{
-    display: none;
-    padding: 6px 12px;
-    border: 1px solid #ccc;
-    border-top: none;
-    }}
-    
     @media screen and (min-width: 601px) {{
         .table-container2 {{
             display: none;
@@ -482,13 +648,23 @@ html_content = f"""
             display: none;
         }}
     }}
-    
+
     ch {{
         text-decoration: underline;
-        -webkit-text-decoration-color: red; /* safari still uses vendor prefix */
+        -webkit-text-decoration-color: red;
         text-decoration-color: red;
         font-size: 24px;
-        font-weight:bold;
+        font-weight: bold;
+    }}
+
+    /* Chart container styling */
+    #chart-container {{
+        background: white;
+        border-radius: 20px;
+        padding: 10px;
+        margin: 10px auto;
+        max-width: 95%;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     }}
 
 </style>
@@ -592,10 +768,10 @@ html_content = f"""
         <div class="card">
             <div class="card-header">
                 {img_to_html('photos/ChaseHead.png')}
+                <hr style="background: #2774AE; background-image: none; height: 3px; border: none; margin: 15px 0;"/>
             </div>
-            <hr color="#2774AE">
             <div class="card-body">
-                <h2>Chase's Wins: {chaseWins}</h2>
+                <h2>Chase's Wins: <br>{chaseWins}</h2>
                 <div class="table-container">
                     {chasesStandings.to_html(index=False)}
                 </div>
@@ -610,10 +786,10 @@ html_content = f"""
         <div class="card">
             <div class="card-header">
                 {img_to_html('photos/BryceHead.png')}
+                <hr style="background: #57068c; background-image: none; height: 3px; border: none; margin: 15px 0;"/>
             </div>
-            <hr color="#57068c">
             <div class="card-body">
-                <h2>Bryce's Wins: {bryceWins}</h2>
+                <h2>Bryce's Wins: <br>{bryceWins}</h2>
                 <div class="table-container">
                     {brycesStandings.to_html(index=False)}
                 </div>
@@ -628,10 +804,10 @@ html_content = f"""
         <div class="card">
             <div class="card-header">
                 {img_to_html('photos/ZachHead.png')}
+                <hr style="background: #e21833; background-image: none; height: 3px; border: none; margin: 15px 0;"/>
             </div>
-            <hr color="#e21833">
             <div class="card-body">
-                <h2>Zach's Wins: {zachWins}</h2>
+                <h2>Zach's Wins: <br>{zachWins}</h2>
                 <div class="table-container" >
                     {zachsStandings.to_html(index=False)}
                 </div>
@@ -642,7 +818,6 @@ html_content = f"""
         </div>
     </div>
 </div>
-<hr/>
 
 <div class="tab">
   <button class="tablinks" onclick="openCity(event, 'TG')">Today's Games</button>
@@ -663,92 +838,6 @@ html_content = f"""
 </body>
 </html>
 """
-
-# === Daily Player Guessing Game Section ===
-# === Daily Player Guessing Game Section (Google Sheets Backend) ===
-# guessing_game_template = '''
-# <!-- Daily Guessing Game Section with Google Sheets Logging -->
-# <div id="daily-guess" style="margin-top: 40px; text-align: center;">
-#   <h2>Guess the Player!</h2>
-#   <img src="{player_image_path}" alt="Guess the player" style="max-width: 200px;"><br><br>
-#   <form id="guess-form" style="display: inline-block;">
-#     <input type="text" id="guess-input" placeholder="Enter player name" required>
-#     <button type="submit">Submit</button>
-#   </form>
-#   <p id="feedback" style="margin-top: 10px;"></p>
-# </div>
-
-# <script>
-#   const acceptedAnswers = "{answers}".toLowerCase().split(",").map(s => s.trim());
-#   const loggingEndpoint = "https://script.google.com/macros/s/AKfycbwXxbDt4e46ugPc2WBzeTvMcgbiIvMQWV07rrQv-VCSAJAmu--p6e021rWWU-axwoK9-A/exec";
-
-#   document.getElementById("guess-form").addEventListener("submit", function(e) {{
-#     e.preventDefault();
-#     const guessInput = document.getElementById("guess-input");
-#     const userGuess = guessInput.value.trim();
-#     const userGuessLower = userGuess.toLowerCase();
-#     const feedback = document.getElementById("feedback");
-
-#     const isCorrect = acceptedAnswers.includes(userGuessLower);
-#     feedback.textContent = isCorrect ? "✅ Correct!" : "❌ Incorrect. Try again!";
-#     feedback.style.color = isCorrect ? "green" : "red";
-
-#     // Log guess (only guess — timestamp is created server-side)
-#     fetch(loggingEndpoint, {{
-#       method: "POST",
-#       mode: "no-cors",
-#       headers: {{
-#         "Content-Type": "application/x-www-form-urlencoded"
-#       }},
-#       body: new URLSearchParams({{
-#         guess: userGuess
-#       }})
-#     }});
-#   }});
-# </script>
-# '''
-
-# guessing_game_html = guessing_game_template.format(
-#     player_image_path=player_image_path,
-#     answers=answers
-# )
-
-
-# # Append the guessing game HTML to the end of the page
-# html_content += guessing_game_html
-
-# yesterday_face_html ='''
-# <!-- Yesterday's Face Dropdown Section -->
-# <details style="margin-top: 40px; text-align: center;">
-#   <summary style="font-size: 1.2em;">Yesterday's Face</summary>
-#   <div style="margin-top: 20px; display: flex; justify-content: center; gap: 40px;">
-#     <div>
-#       <img src="{yesterday_silhouette_image}" alt="Silhouette" style="max-width: 200px;"><br>
-#     </div>
-#     <div>
-#       <img src="{yesterday_image}" alt="Full Image" style="max-width: 200px;"><br>
-#     </div>
-#   </div>
-#   <p style="margin-top: 10px;"><strong>{yesterday_player_name}</strong></p>
-# </details>
-# '''
-
-# yesterday = date.today()-pd.Timedelta(days=1)
-# yesterday = yesterday.strftime("%Y-%m-%d")
-# row = schedule_df[schedule_df["date"] == yesterday]
-
-# # Extract data
-# yesterday_player_name = row.iloc[0]["player_name"]
-# yesterday_silhouette_image = "image silhouettes/"+yesterday_player_name+"_silhouette.jpg"
-# yesterday_image = "images/"+yesterday_player_name+".jpg"
-# print(yesterday_silhouette_image)
-# yesterday_face_html = yesterday_face_html.format(
-#     yesterday_silhouette_image=yesterday_silhouette_image,
-#     yesterday_image=yesterday_image,
-#     yesterday_player_name=yesterday_player_name
-# )
-
-# html_content += yesterday_face_html
 
 # Write HTML content to a file
 with open('index.html', 'w') as f:
