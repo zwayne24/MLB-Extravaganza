@@ -686,7 +686,7 @@ html_content = f"""
         progressBar.innerText = percentage+ "%";
     </script>
 
-<h1>MLB Extravaganza</h1>
+<h1>MLB Palooza</h1>
 <div id="chart-container">
     <canvas id="myLineChart"></canvas>
 </div>
