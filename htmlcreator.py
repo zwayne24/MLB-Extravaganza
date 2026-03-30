@@ -678,7 +678,7 @@ html_content = f"""
 
     <script>
         let x = {chaseWins+ bryceWins + zachWins}
-        let y = {1230}
+        let y = {2430}
         let percentage = ((x / y) * 100).toFixed(1);
 
         let progressBar = document.getElementById("progressBar");
