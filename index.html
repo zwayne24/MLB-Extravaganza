@@ -426,7 +426,7 @@
     </div>
 
     <script>
-        let x = 182
+        let x = 188
         let y = 2430
         let percentage = ((x / y) * 100).toFixed(1);
 
@@ -447,10 +447,10 @@
     const myLineChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Mar-24', 'Mar-25', 'Mar-26', 'Mar-27', 'Mar-28', 'Mar-29', 'Mar-30', 'Mar-31', 'Apr-01', 'Apr-02', 'Apr-03', 'Apr-04', 'Apr-05', 'Apr-06', 'Apr-07', 'Apr-08'],
+            labels: ['Mar-24', 'Mar-25', 'Mar-26', 'Mar-27', 'Mar-28', 'Mar-29', 'Mar-30', 'Mar-31', 'Apr-01', 'Apr-02', 'Apr-03', 'Apr-04', 'Apr-05', 'Apr-06', 'Apr-07', 'Apr-08', 'Apr-09'],
             datasets: [{
                 label: 'Chase',
-                data: [0, 0, 0, 0, 0, 3, 1, 0, 2, 2, 0, 0, 0, 0, 0, 0],
+                data: [0, 0, 0, 0, 0, 3, 1, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0],
                 fill: false,
                 borderColor: '#2774AE',
                 tension: 0.1,
@@ -458,7 +458,7 @@
             },
             {
                 label: 'Bryce',
-                data: [0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 2, 6, 9, 10, 12, 7],
+                data: [0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 2, 6, 9, 10, 12, 7, 4],
                 fill: false,
                 borderColor: '#57068c',
                 tension: 0.1,
@@ -466,7 +466,7 @@
             },
             {
                 label: 'Zach',
-                data: [0, 1, 1, 0, 2, 5, 7, 7, 8, 8, 7, 9, 10, 10, 11, 7],
+                data: [0, 1, 1, 0, 2, 5, 7, 7, 8, 8, 7, 9, 10, 10, 11, 7, 4],
                 fill: false,
                 borderColor: '#e21833',
                 tension: 0.1,
@@ -520,7 +520,7 @@
                 <hr style="background: #2774AE; background-image: none; height: 3px; border: none; margin: 15px 0;"/>
             </div>
             <div class="card-body">
-                <h2>Chase's Wins: <br>56</h2>
+                <h2>Chase's Wins: <br>60</h2>
                 <div class="table-container">
                     <table border="1" class="dataframe">
   <thead>
@@ -532,28 +532,28 @@
   </thead>
   <tbody>
     <tr>
+      <td>Miami Marlins</td>
+      <td>8</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>San Diego Padres</td>
+      <td>7</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td>Arizona Diamondbacks</td>
+      <td>7</td>
+      <td>6</td>
+    </tr>
+    <tr>
       <td>St. Louis Cardinals</td>
       <td>7</td>
       <td>5</td>
     </tr>
     <tr>
-      <td>Miami Marlins</td>
-      <td>7</td>
-      <td>5</td>
-    </tr>
-    <tr>
       <td>Minnesota Twins</td>
-      <td>6</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <td>Arizona Diamondbacks</td>
-      <td>6</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <td>San Diego Padres</td>
-      <td>6</td>
+      <td>7</td>
       <td>6</td>
     </tr>
     <tr>
@@ -562,14 +562,14 @@
       <td>6</td>
     </tr>
     <tr>
-      <td>Kansas City Royals</td>
+      <td>Toronto Blue Jays</td>
       <td>5</td>
       <td>7</td>
     </tr>
     <tr>
-      <td>Toronto Blue Jays</td>
+      <td>Kansas City Royals</td>
       <td>5</td>
-      <td>7</td>
+      <td>8</td>
     </tr>
     <tr>
       <td>Boston Red Sox</td>
@@ -594,35 +594,35 @@
   </thead>
   <tbody>
     <tr>
+      <td>MIA</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <td>SD</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <td>ARI</td>
+      <td>7</td>
+    </tr>
+    <tr>
       <td>STL</td>
       <td>7</td>
     </tr>
     <tr>
-      <td>MIA</td>
-      <td>7</td>
-    </tr>
-    <tr>
       <td>MIN</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <td>ARI</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <td>SD</td>
-      <td>6</td>
+      <td>7</td>
     </tr>
     <tr>
       <td>BAL</td>
       <td>6</td>
     </tr>
     <tr>
-      <td>KC</td>
+      <td>TOR</td>
       <td>5</td>
     </tr>
     <tr>
-      <td>TOR</td>
+      <td>KC</td>
       <td>5</td>
     </tr>
     <tr>
@@ -647,7 +647,7 @@
                 <hr style="background: #57068c; background-image: none; height: 3px; border: none; margin: 15px 0;"/>
             </div>
             <div class="card-body">
-                <h2>Bryce's Wins: <br>63</h2>
+                <h2>Bryce's Wins: <br>64</h2>
                 <div class="table-container">
                     <table border="1" class="dataframe">
   <thead>
@@ -664,12 +664,12 @@
       <td>3</td>
     </tr>
     <tr>
-      <td>Cincinnati Reds</td>
+      <td>Cleveland Guardians</td>
       <td>8</td>
-      <td>4</td>
+      <td>5</td>
     </tr>
     <tr>
-      <td>Cleveland Guardians</td>
+      <td>Cincinnati Reds</td>
       <td>8</td>
       <td>5</td>
     </tr>
@@ -679,12 +679,12 @@
       <td>5</td>
     </tr>
     <tr>
-      <td>Philadelphia Phillies</td>
+      <td>Colorado Rockies</td>
       <td>6</td>
-      <td>6</td>
+      <td>7</td>
     </tr>
     <tr>
-      <td>Colorado Rockies</td>
+      <td>Philadelphia Phillies</td>
       <td>6</td>
       <td>6</td>
     </tr>
@@ -700,13 +700,13 @@
     </tr>
     <tr>
       <td>Chicago White Sox</td>
-      <td>4</td>
+      <td>5</td>
       <td>8</td>
     </tr>
     <tr>
       <td>Detroit Tigers</td>
       <td>4</td>
-      <td>8</td>
+      <td>9</td>
     </tr>
   </tbody>
 </table>
@@ -725,11 +725,11 @@
       <td>9</td>
     </tr>
     <tr>
-      <td>CIN</td>
+      <td>CLE</td>
       <td>8</td>
     </tr>
     <tr>
-      <td>CLE</td>
+      <td>CIN</td>
       <td>8</td>
     </tr>
     <tr>
@@ -737,11 +737,11 @@
       <td>7</td>
     </tr>
     <tr>
-      <td>PHI</td>
+      <td>COL</td>
       <td>6</td>
     </tr>
     <tr>
-      <td>COL</td>
+      <td>PHI</td>
       <td>6</td>
     </tr>
     <tr>
@@ -754,7 +754,7 @@
     </tr>
     <tr>
       <td>CHW</td>
-      <td>4</td>
+      <td>5</td>
     </tr>
     <tr>
       <td>DET</td>
@@ -774,7 +774,7 @@
                 <hr style="background: #e21833; background-image: none; height: 3px; border: none; margin: 15px 0;"/>
             </div>
             <div class="card-body">
-                <h2>Zach's Wins: <br>63</h2>
+                <h2>Zach's Wins: <br>64</h2>
                 <div class="table-container" >
                     <table border="1" class="dataframe">
   <thead>
@@ -786,19 +786,19 @@
   </thead>
   <tbody>
     <tr>
-      <td>Atlanta Braves</td>
-      <td>8</td>
-      <td>5</td>
-    </tr>
-    <tr>
       <td>Milwaukee Brewers</td>
       <td>8</td>
       <td>4</td>
     </tr>
     <tr>
+      <td>Atlanta Braves</td>
+      <td>8</td>
+      <td>5</td>
+    </tr>
+    <tr>
       <td>New York Yankees</td>
       <td>8</td>
-      <td>3</td>
+      <td>4</td>
     </tr>
     <tr>
       <td>Texas Rangers</td>
@@ -808,11 +808,6 @@
     <tr>
       <td>New York Mets</td>
       <td>7</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <td>Chicago Cubs</td>
-      <td>6</td>
       <td>6</td>
     </tr>
     <tr>
@@ -821,13 +816,18 @@
       <td>7</td>
     </tr>
     <tr>
-      <td>Tampa Bay Rays</td>
+      <td>Chicago Cubs</td>
+      <td>6</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td>Athletics</td>
       <td>5</td>
       <td>7</td>
     </tr>
     <tr>
-      <td>Athletics</td>
-      <td>4</td>
+      <td>Tampa Bay Rays</td>
+      <td>5</td>
       <td>7</td>
     </tr>
     <tr>
@@ -848,11 +848,11 @@
   </thead>
   <tbody>
     <tr>
-      <td>ATL</td>
+      <td>MIL</td>
       <td>8</td>
     </tr>
     <tr>
-      <td>MIL</td>
+      <td>ATL</td>
       <td>8</td>
     </tr>
     <tr>
@@ -868,20 +868,20 @@
       <td>7</td>
     </tr>
     <tr>
-      <td>CHC</td>
-      <td>6</td>
-    </tr>
-    <tr>
       <td>HOU</td>
       <td>6</td>
     </tr>
     <tr>
-      <td>TB</td>
-      <td>5</td>
+      <td>CHC</td>
+      <td>6</td>
     </tr>
     <tr>
       <td>ATH</td>
-      <td>4</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>TB</td>
+      <td>5</td>
     </tr>
     <tr>
       <td>WSH</td>
@@ -903,12 +903,12 @@
 
 <div id="TG" class="tabcontent">
     <h2 style="text-align: center;">Today's Games</h2>
-    <table><thead><tr><th>Home Team</th><th>Away Team</th><th>Time</th><th>Odds</th></tr></thead><tbody><td style='color:#2774AE'>MIA</td><td style='color:#57068c'>CIN</td><td>12:10 PM</td><td>MIA -131</td></tr><td style='color:#e21833'>NYY</td><td style='color:#e21833'>ATH</td><td>1:35 PM</td><td>NYY -219</td></tr><td style='color:#2774AE'>MIN</td><td style='color:#57068c'>DET</td><td>1:40 PM</td><td>DET -136</td></tr><td style='color:#e21833'>NYM</td><td style='color:#2774AE'>ARI</td><td>7:10 PM</td><td>NYM -168</td></tr><td style='color:#2774AE'>KC</td><td style='color:#57068c'>CHW</td><td>7:40 PM</td><td>KC -194</td></tr><td style='color:#2774AE'>SD</td><td style='color:#57068c'>COL</td><td>9:40 PM</td><td>SD -207</td></tr></tbody></table>
+    <table><thead><tr><th>Home Team</th><th>Away Team</th><th>Time</th><th>Odds</th></tr></thead><tbody><td style='color:#e21833'>CHC</td><td style='color:#57068c'>PIT</td><td>2:20 PM</td><td>CHC -156</td></tr><td style='color:#57068c'>PHI</td><td style='color:#2774AE'>ARI</td><td>6:40 PM</td><td>PHI -186</td></tr><td style='color:#57068c'>DET</td><td style='color:#2774AE'>MIA</td><td>6:40 PM</td><td>DET -149</td></tr><td style='color:#57068c'>CIN</td><td style='color:#57068c'>LAA</td><td>6:45 PM</td><td>CIN -194</td></tr><td style='color:#2774AE'>TOR</td><td style='color:#2774AE'>MIN</td><td>7:07 PM</td><td>TOR -143</td></tr><td style='color:#e21833'>NYM</td><td style='color:#e21833'>ATH</td><td>7:10 PM</td><td>NYM -156</td></tr><td style='color:#e21833'>TB</td><td style='color:#e21833'>NYY</td><td>7:10 PM</td><td>NYY -149</td></tr><td style='color:#e21833'>ATL</td><td style='color:#57068c'>CLE</td><td>7:15 PM</td><td>ATL -136</td></tr><td style='color:#2774AE'>BAL</td><td style='color:#57068c'>SF</td><td>7:15 PM</td><td>BAL -126</td></tr><td style='color:#2774AE'>KC</td><td style='color:#57068c'>CHW</td><td>7:40 PM</td><td>KC -181</td></tr><td style='color:#e21833'>MIL</td><td style='color:#e21833'>WSH</td><td>7:40 PM</td><td>MIL -199</td></tr><td style='color:#2774AE'>STL</td><td style='color:#2774AE'>BOS</td><td>8:15 PM</td><td>BOS -149</td></tr><td style='color:#2774AE'>SD</td><td style='color:#57068c'>COL</td><td>9:40 PM</td><td>SD -186</td></tr><td style='color:#2774AE'>SEA</td><td style='color:#e21833'>HOU</td><td>9:40 PM</td><td>SEA -143</td></tr><td style='color:#57068c'>LAD</td><td style='color:#e21833'>TEX</td><td>10:10 PM</td><td>LAD -240</td></tr></tbody></table>
 </div>
 
 <div id="YG" class="tabcontent">
   <h2 style="text-align: center;">Yesterday's Games</h2>
-  <table><thead><tr><th>Home Team</th><th>Away Team</th><th>Result</th></tr></thead><tbody><td style='color:#57068c'>PIT</td><td style='background-color:#2774AE;color:white;'> <strong>SD</strong></td><td>SD 8, PIT 2</td></tr><td style='background-color:#57068c;color:white;'> <strong>CLE</strong></td><td style='color:#2774AE'>KC</td><td>CLE 10, KC 2</td></tr><td style='background-color:#2774AE;color:white;'> <strong>BOS</strong></td><td style='color:#e21833'>MIL</td><td>BOS 5, MIL 0</td></tr><td style='color:#57068c'>CHW</td><td style='background-color:#2774AE;color:white;'> <strong>BAL</strong></td><td>BAL 5, CHW 3</td></tr><td style='background-color:#e21833;color:white;'> <strong>TEX</strong></td><td style='color:#2774AE'>SEA</td><td>TEX 3, SEA 0</td></tr><td style='background-color:#2774AE;color:white;'> <strong>TOR</strong></td><td style='color:#57068c'>LAD</td><td>TOR 4, LAD 3</td></tr><td style='background-color:#57068c;color:white;'> <strong>COL</strong></td><td style='color:#e21833'>HOU</td><td>COL 9, HOU 1</td></tr><td style='background-color:#57068c;color:white;'> <strong>SF</strong></td><td style='color:#57068c'>PHI</td><td>SF 5, PHI 0</td></tr><td style='color:#e21833'>WSH</td><td style='background-color:#2774AE;color:white;'> <strong>STL</strong></td><td>STL 6, WSH 1</td></tr><td style='color:#57068c'>LAA</td><td style='background-color:#e21833;color:white;'> <strong>ATL</strong></td><td>ATL 8, LAA 2</td></tr><td style='color:#e21833'>NYM</td><td style='background-color:#2774AE;color:white;'> <strong>ARI</strong></td><td>ARI 7, NYM 2</td></tr><td style='color:#e21833'>TB</td><td style='background-color:#e21833;color:white;'> <strong>CHC</strong></td><td>CHC 6, TB 2</td></tr><td style='background-color:#2774AE;color:white;'> <strong>MIA</strong></td><td style='color:#57068c'>CIN</td><td>MIA 7, CIN 4</td></tr><td style='color:#e21833'>NYY</td><td style='background-color:#e21833;color:white;'> <strong>ATH</strong></td><td>ATH 3, NYY 2</td></tr><td style='background-color:#2774AE;color:white;'> <strong>MIN</strong></td><td style='color:#57068c'>DET</td><td>MIN 8, DET 6</td></tr></tbody></table>
+  <table><thead><tr><th>Home Team</th><th>Away Team</th><th>Result</th></tr></thead><tbody><td style='background-color:#2774AE;color:white;'> <strong>MIA</strong></td><td style='color:#57068c'>CIN</td><td>MIA 8, CIN 1</td></tr><td style='color:#e21833'>NYY</td><td style='background-color:#e21833;color:white;'> <strong>ATH</strong></td><td>ATH 1, NYY 0</td></tr><td style='background-color:#2774AE;color:white;'> <strong>MIN</strong></td><td style='color:#57068c'>DET</td><td>MIN 3, DET 1</td></tr><td style='color:#e21833'>NYM</td><td style='background-color:#2774AE;color:white;'> <strong>ARI</strong></td><td>ARI 7, NYM 1</td></tr><td style='color:#2774AE'>KC</td><td style='background-color:#57068c;color:white;'> <strong>CHW</strong></td><td>CHW 2, KC 0</td></tr><td style='background-color:#2774AE;color:white;'> <strong>SD</strong></td><td style='color:#57068c'>COL</td><td>SD 7, COL 3 (F/12)</td></tr></tbody></table>
 </div>
 
 </body>
@@ -917,4 +917,4 @@
     <h3 class="daily-overview-title">Daily Overview</h3>
     <table class="standings-table">
       <tr><th></th><th>Teams Playing</th><th>Max Wins</th><th>Min Wins</th><th>Favored</th></tr>
-    <tr><td style='color:#2774AE; font-weight:bold;'>Chase</td><td>5</td><td>5</td><td>0</td><td>3</td></tr><tr><td style='color:#57068c; font-weight:bold;'>Bryce</td><td>4</td><td>4</td><td>0</td><td>1</td></tr><tr><td style='color:#e21833; font-weight:bold;'>Zach</td><td>3</td><td>2</td><td>1</td><td>2</td></tr></table>
+    <tr><td style='color:#2774AE; font-weight:bold;'>Chase</td><td>10</td><td>8</td><td>2</td><td>6</td></tr><tr><td style='color:#57068c; font-weight:bold;'>Bryce</td><td>10</td><td>9</td><td>1</td><td>4</td></tr><tr><td style='color:#e21833; font-weight:bold;'>Zach</td><td>10</td><td>7</td><td>3</td><td>5</td></tr></table>
