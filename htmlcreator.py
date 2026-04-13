@@ -123,11 +123,25 @@ ChasesTeams = ['Toronto Blue Jays', 'Seattle Mariners', 'Boston Red Sox', 'Balti
 BrycesTeams = ['Los Angeles Dodgers', 'Philadelphia Phillies', 'Detroit Tigers', 'San Francisco Giants', 'Cleveland Guardians', 'Cincinnati Reds', 'Pittsburgh Pirates', 'Los Angeles Angels', 'Chicago White Sox', 'Colorado Rockies']
 ZachsTeams = ['New York Yankees', 'New York Mets', 'Chicago Cubs', 'Atlanta Braves', 'Houston Astros', 'Milwaukee Brewers', 'Texas Rangers', 'Tampa Bay Rays', 'Athletics', 'Washington Nationals']
 
+# Snake draft order: Bryce 1st, Zach 2nd, Chase 3rd. Team arrays are in pick order.
+# R1: Bryce(1), Zach(2), Chase(3) | R2: Chase(4), Zach(5), Bryce(6) | R3: Bryce(7), ...
+_bryce_ovr = [1,  6,  7, 12, 13, 18, 19, 24, 25, 30]
+_zach_ovr  = [2,  5,  8, 11, 14, 17, 20, 23, 26, 29]
+_chase_ovr = [3,  4,  9, 10, 15, 16, 21, 22, 27, 28]
+draft_info = {}
+for i, team in enumerate(BrycesTeams):
+    ovr = _bryce_ovr[i]; draft_info[team] = {'rd': (ovr - 1) // 3 + 1, 'ovr': ovr}
+for i, team in enumerate(ZachsTeams):
+    ovr = _zach_ovr[i];  draft_info[team] = {'rd': (ovr - 1) // 3 + 1, 'ovr': ovr}
+for i, team in enumerate(ChasesTeams):
+    ovr = _chase_ovr[i]; draft_info[team] = {'rd': (ovr - 1) // 3 + 1, 'ovr': ovr}
+
 # Process standings data
 standings['W'] = standings['W'].astype(int)
 standings['L'] = standings['L'].astype(int)
 standings['PCT'] = standings['PCT'].astype(float)
 standings = standings.sort_values(by='W', ascending=False).drop(columns=['PCT'])
+overall_live_rank = {row['Team']: idx + 1 for idx, row in standings.reset_index(drop=True).iterrows()}
 
 chasesStandings = standings[standings['Team'].isin(ChasesTeams)].reset_index(drop=True)
 chasesStandings.index += 1
@@ -153,6 +167,52 @@ zachStandingsMobile['Team'] = zachStandingsMobile['Team'].map(teamToAbbr)
 chaseStandingsMobile = chaseStandingsMobile[['Team', 'W']]
 bryceStandingsMobile = bryceStandingsMobile[['Team', 'W']]
 zachStandingsMobile = zachStandingsMobile[['Team', 'W']]
+
+def build_combined_value_view_html(draft_info, overall_live_rank, teamToAbbr, ChasesTeams, BrycesTeams, ZachsTeams):
+    owner_colors = {'Chase': '#2774AE', 'Bryce': '#57068c', 'Zach': '#e21833'}
+    owner_map = {}
+    for team in ChasesTeams: owner_map[team] = 'Chase'
+    for team in BrycesTeams: owner_map[team] = 'Bryce'
+    for team in ZachsTeams: owner_map[team] = 'Zach'
+
+    rows = []
+    for team in list(ChasesTeams) + list(BrycesTeams) + list(ZachsTeams):
+        abbr = teamToAbbr.get(team, team)
+        owner = owner_map.get(team, '')
+        color = owner_colors.get(owner, '#999')
+        d = draft_info.get(team, {})
+        draft_ovr = d.get('ovr', 0)
+        live_ovr = overall_live_rank.get(team, 0)
+        delta = (live_ovr - draft_ovr) if (draft_ovr and live_ovr) else 0
+        rows.append((abbr, owner, color, draft_ovr, live_ovr, delta))
+
+    rows.sort(key=lambda x: x[4])  # default sort: current rank
+
+    html = '<table class="standings-table" id="valueTable"><thead><tr>'
+    html += '<th>TEAM</th>'
+    html += '<th class="sortable" onclick="sortValueTable(1)">DRAFT &#8597;</th>'
+    html += '<th class="sortable" onclick="sortValueTable(2)">CURR &#8597;</th>'
+    html += '<th class="sortable" onclick="sortValueTable(3)">&#916; &#8597;</th>'
+    html += '</tr></thead><tbody>'
+
+    for abbr, owner, color, draft_ovr, live_ovr, delta in rows:
+        if delta < 0:
+            delta_html = f"<span style='color:#22c55e;font-weight:bold;'>&#9650;&nbsp;{abs(delta)}</span>"
+        elif delta > 0:
+            delta_html = f"<span style='color:#ef4444;font-weight:bold;'>&#9660;&nbsp;{delta}</span>"
+        else:
+            delta_html = "&#8212;"
+        html += f'<tr data-owner="{owner}">'
+        html += f'<td style="border-left:4px solid {color};font-weight:600;padding-left:12px;">{abbr}</td>'
+        html += f'<td data-val="{draft_ovr}">{draft_ovr}</td>'
+        html += f'<td data-val="{live_ovr}">{live_ovr}</td>'
+        html += f'<td data-val="{delta}">{delta_html}</td>'
+        html += '</tr>'
+
+    html += '</tbody></table>'
+    return html
+
+combined_value_html = build_combined_value_view_html(draft_info, overall_live_rank, teamToAbbr, ChasesTeams, BrycesTeams, ZachsTeams)
 
 # Calculate total wins and losses
 chaseWins = chasesStandings['W'].sum()
@@ -341,6 +401,44 @@ html_content = f"""
         // Show the current tab, and add an "active" class to the button that opened the tab
         document.getElementById(cityName).style.display = "block";
         evt.currentTarget.className += " active";
+    }}
+
+    var _valueViewActive = false;
+    function toggleValueView() {{
+        _valueViewActive = !_valueViewActive;
+        document.querySelectorAll('.toggle-btn').forEach(function(b) {{
+            b.classList.toggle('active', _valueViewActive);
+        }});
+        document.getElementById('cardsRow').style.display = _valueViewActive ? 'none' : '';
+        document.getElementById('valueViewSection').style.display = _valueViewActive ? 'block' : 'none';
+    }}
+
+    var _sortCol = 2;
+    var _sortAsc = true;
+
+    function sortValueTable(col) {{
+        if (_sortCol === col) {{
+            _sortAsc = !_sortAsc;
+        }} else {{
+            _sortCol = col;
+            _sortAsc = true;
+        }}
+        var tbody = document.querySelector('#valueTable tbody');
+        var rows = Array.from(tbody.querySelectorAll('tr'));
+        rows.sort(function(a, b) {{
+            var aVal = parseFloat(a.cells[col].dataset.val);
+            var bVal = parseFloat(b.cells[col].dataset.val);
+            return _sortAsc ? aVal - bVal : bVal - aVal;
+        }});
+        rows.forEach(function(r) {{ tbody.appendChild(r); }});
+    }}
+
+    function filterOwner(btn, owner) {{
+        document.querySelectorAll('.vf-btn').forEach(function(b) {{ b.classList.remove('active'); }});
+        btn.classList.add('active');
+        document.querySelectorAll('#valueTable tbody tr').forEach(function(r) {{
+            r.style.display = (owner === 'all' || r.dataset.owner === owner) ? '' : 'none';
+        }});
     }}
     </script>
     <style>
@@ -732,6 +830,114 @@ html_content = f"""
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     }}
 
+    .title-row {{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        max-width: 1400px;
+        margin: 20px auto;
+        position: relative;
+    }}
+
+    .title-row h1 {{
+        margin: 0;
+    }}
+
+    .toggle-btn {{
+        position: absolute;
+        right: 0;
+        background: rgba(255,255,255,0.2);
+        border: 2px solid rgba(255,255,255,0.6);
+        color: white;
+        padding: 8px 18px;
+        border-radius: 50px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        backdrop-filter: blur(5px);
+        white-space: nowrap;
+    }}
+
+    .toggle-btn:hover {{
+        background: rgba(255,255,255,0.35);
+    }}
+
+    .toggle-btn.active {{
+        background: white;
+        color: #4d94e8;
+        border-color: white;
+    }}
+
+    #valueViewSection {{
+        display: none;
+        max-width: 600px;
+        margin: 20px auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        padding: 20px;
+    }}
+
+    .value-filter {{
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }}
+
+    .vf-btn {{
+        background: transparent;
+        border: 2px solid #ddd;
+        padding: 6px 18px;
+        border-radius: 50px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: #666;
+    }}
+
+    .vf-btn.active, .vf-btn:hover {{
+        background: linear-gradient(135deg, #7B77FE 0%, #5450d4 100%) !important;
+        color: white !important;
+        border-color: transparent !important;
+    }}
+
+    .sortable {{
+        cursor: pointer;
+    }}
+
+    .sortable:hover {{
+        opacity: 0.8;
+    }}
+
+    @media screen and (max-width: 600px) {{
+        #valueViewSection {{
+            max-width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+        }}
+    }}
+
+    .desktop-vv {{ display: inline-block; }}
+    .mobile-vv  {{ display: none; }}
+
+    @media screen and (max-width: 600px) {{
+        .toggle-btn {{
+            padding: 6px 10px;
+            font-size: 11px;
+        }}
+        .desktop-vv {{ display: none; }}
+        .mobile-vv  {{
+            display: block;
+            position: static;
+            width: fit-content;
+            margin: 14px auto;
+        }}
+    }}
+
 </style>
 
 </head>
@@ -751,7 +957,10 @@ html_content = f"""
         progressBar.innerText = percentage+ "%";
     </script>
 
-<h1>MLB Palooza</h1>
+<div class="title-row">
+    <h1>MLB Palooza</h1>
+    <button id="valueViewBtn" class="toggle-btn desktop-vv" onclick="toggleValueView()">Value View</button>
+</div>
 <div id="chart-container">
     <canvas id="myLineChart"></canvas>
 </div>
@@ -826,9 +1035,10 @@ html_content = f"""
             }}
         }}
     }});
-</script>           
+</script>
+<button id="valueViewBtnM" class="toggle-btn mobile-vv" onclick="toggleValueView()">Value View</button>
 
-<div class="row">
+<div class="row" id="cardsRow">
     <div class="column">
         <div class="card">
             <div class="card-header">
@@ -860,7 +1070,7 @@ html_content = f"""
                 </div>
                 <div class="table-container2">
                     {bryceStandingsMobile.to_html(index=False)}
-                </div>        
+                </div>
             </div>
         </div>
     </div>
@@ -873,7 +1083,7 @@ html_content = f"""
             </div>
             <div class="card-body">
                 <h2>Zach's Wins: <br>{zachWins}</h2>
-                <div class="table-container" >
+                <div class="table-container">
                     {zachsStandings.to_html(index=False)}
                 </div>
                 <div class="table-container2">
@@ -882,6 +1092,16 @@ html_content = f"""
             </div>
         </div>
     </div>
+</div>
+
+<div id="valueViewSection">
+    <div class="value-filter">
+        <button class="vf-btn active" data-owner="all" onclick="filterOwner(this, 'all')">All</button>
+        <button class="vf-btn" data-owner="Chase" onclick="filterOwner(this, 'Chase')" style="border-color:#2774AE;color:#2774AE;">Chase</button>
+        <button class="vf-btn" data-owner="Bryce" onclick="filterOwner(this, 'Bryce')" style="border-color:#57068c;color:#57068c;">Bryce</button>
+        <button class="vf-btn" data-owner="Zach" onclick="filterOwner(this, 'Zach')" style="border-color:#e21833;color:#e21833;">Zach</button>
+    </div>
+    {combined_value_html}
 </div>
 
 <div class="tab">
