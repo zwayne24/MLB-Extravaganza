@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import base64
 from pathlib import Path
-from datetime import date
+from datetime import date, timedelta, datetime
 
 # Function to convert image to base64
 def img_to_bytes(img_path):
@@ -237,11 +237,25 @@ headers = {
 response = requests.get(url, headers=headers)
 soup = BeautifulSoup(response.text, 'html.parser')
 
-# Locate the schedule table
+# Locate the schedule table by matching the date header in each ScheduleTables div
 matchups = []
 yesterday = []
-schedule_table = soup.find_all('div', class_='ScheduleTables')[1]
-yesterday_table = soup.find_all('div', class_='ScheduleTables')[0]
+schedule_table = None
+yesterday_table = None
+_today = date.today()
+_yesterday = _today - timedelta(days=1)
+for _t in soup.find_all('div', class_='ScheduleTables'):
+    _title = _t.find('div', class_='Table__Title')
+    if not _title:
+        continue
+    try:
+        _d = datetime.strptime(_title.text.strip(), '%A, %B %d, %Y').date()
+        if _d == _today:
+            schedule_table = _t
+        elif _d == _yesterday:
+            yesterday_table = _t
+    except ValueError:
+        pass
 
 if schedule_table:
     # Find each matchup row
