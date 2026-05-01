@@ -119,6 +119,20 @@ for team in soup.find_all('tr', class_='filled Table__TR Table__TR--sm Table__ev
         standings = pd.concat([standings, new_row], ignore_index=True)
     i += 1
 
+# Create a back-and-forth rank order: 1st, 16th, 2nd, 17th, 3rd, 18th, ...
+standings_reset = standings.reset_index(drop=True)
+n = len(standings_reset)
+indices = []
+for i in range(n // 2):
+    indices.append(i)                 # front
+    if i + n // 2 < n:
+        indices.append(i + n // 2)    # back
+# If odd number of teams, add last middle one
+if n % 2 != 0:
+    indices.append(n // 2)
+
+overall_live_rank = {standings_reset.iloc[idx]['Team']: rnk + 1 for rnk, idx in enumerate(indices)}
+
 ChasesTeams = ['Toronto Blue Jays', 'Seattle Mariners', 'Boston Red Sox', 'Baltimore Orioles', 'San Diego Padres', 'Kansas City Royals', 'Arizona Diamondbacks', 'Miami Marlins', 'Minnesota Twins', 'St. Louis Cardinals']
 BrycesTeams = ['Los Angeles Dodgers', 'Philadelphia Phillies', 'Detroit Tigers', 'San Francisco Giants', 'Cleveland Guardians', 'Cincinnati Reds', 'Pittsburgh Pirates', 'Los Angeles Angels', 'Chicago White Sox', 'Colorado Rockies']
 ZachsTeams = ['New York Yankees', 'New York Mets', 'Chicago Cubs', 'Atlanta Braves', 'Houston Astros', 'Milwaukee Brewers', 'Texas Rangers', 'Tampa Bay Rays', 'Athletics', 'Washington Nationals']
@@ -141,7 +155,7 @@ standings['W'] = standings['W'].astype(int)
 standings['L'] = standings['L'].astype(int)
 standings['PCT'] = standings['PCT'].astype(float)
 standings = standings.sort_values(by='W', ascending=False).drop(columns=['PCT'])
-overall_live_rank = {row['Team']: idx + 1 for idx, row in standings.reset_index(drop=True).iterrows()}
+print(overall_live_rank)
 
 chasesStandings = standings[standings['Team'].isin(ChasesTeams)].reset_index(drop=True)
 chasesStandings.index += 1
