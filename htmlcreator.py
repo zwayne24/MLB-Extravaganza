@@ -155,7 +155,6 @@ standings['W'] = standings['W'].astype(int)
 standings['L'] = standings['L'].astype(int)
 standings['PCT'] = standings['PCT'].astype(float)
 standings = standings.sort_values(by='W', ascending=False).drop(columns=['PCT'])
-print(overall_live_rank)
 
 chasesStandings = standings[standings['Team'].isin(ChasesTeams)].reset_index(drop=True)
 chasesStandings.index += 1
