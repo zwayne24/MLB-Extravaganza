@@ -1,3 +1,4 @@
+import os
 import requests
 import pandas as pd
 import base64
@@ -250,6 +251,35 @@ today_resp = requests.get(
 )
 today_data = today_resp.json()
 
+# Fetch moneyline odds from The Odds API — keyed by (home_full_name, away_full_name)
+odds_by_matchup = {}
+ODDS_API_KEY = os.environ.get('ODDS_API_KEY', '')
+if ODDS_API_KEY:
+    odds_resp = requests.get(
+        'https://api.the-odds-api.com/v4/sports/baseball_mlb/odds/',
+        params={'apiKey': ODDS_API_KEY, 'regions': 'us', 'markets': 'h2h', 'oddsFormat': 'american'}
+    )
+    if odds_resp.status_code == 200:
+        for game in odds_resp.json():
+            home_full = game['home_team']
+            away_full = game['away_team']
+            for bookmaker in game.get('bookmakers', []):
+                for market in bookmaker.get('markets', []):
+                    if market['key'] == 'h2h':
+                        prices = {o['name']: o['price'] for o in market['outcomes']}
+                        home_price = prices.get(home_full)
+                        away_price = prices.get(away_full)
+                        if home_price is not None and away_price is not None:
+                            if home_price < away_price:
+                                fav_full, fav_price = home_full, home_price
+                            else:
+                                fav_full, fav_price = away_full, away_price
+                            fav_abbr = teamToAbbr.get(fav_full, fav_full)
+                            price_str = f"+{fav_price}" if fav_price > 0 else str(fav_price)
+                            odds_by_matchup[(home_full, away_full)] = f"{fav_abbr} {price_str}"
+                        break
+                break
+
 matchups = []
 if today_data.get('dates'):
     for game in today_data['dates'][0]['games']:
@@ -266,7 +296,7 @@ if today_data.get('dates'):
             'away_team': away_abbr,
             'home_team': home_abbr,
             'time': game_time,
-            'odds': None,
+            'odds': odds_by_matchup.get((home_name, away_name)),
         })
 
 yesterday_resp = requests.get(
