@@ -1,9 +1,12 @@
+import os
 import requests
-from bs4 import BeautifulSoup
 import pandas as pd
 import base64
 from pathlib import Path
 from datetime import date, timedelta, datetime
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Function to convert image to base64
 def img_to_bytes(img_path):
@@ -81,48 +84,42 @@ def generate_daily_projection_table(matchups_df, ChasesTeams, BrycesTeams, Zachs
     html += "</table>"
     return html
 
-# Scrape standings from ESPN
-url = 'https://www.espn.com/mlb/standings/_/group/overall'
-headers = {
-    'User-Agent': 'Mozilla/5.0'
+# Maps the short team names the MLB Stats API returns to full names used everywhere else
+MLB_API_NAME_TO_FULL = {
+    'Yankees': 'New York Yankees', 'Mets': 'New York Mets', 'Cubs': 'Chicago Cubs',
+    'Braves': 'Atlanta Braves', 'Astros': 'Houston Astros', 'Brewers': 'Milwaukee Brewers',
+    'Rangers': 'Texas Rangers', 'Rays': 'Tampa Bay Rays', 'Athletics': 'Athletics',
+    'Nationals': 'Washington Nationals', 'Dodgers': 'Los Angeles Dodgers',
+    'Phillies': 'Philadelphia Phillies', 'Tigers': 'Detroit Tigers',
+    'Giants': 'San Francisco Giants', 'Guardians': 'Cleveland Guardians',
+    'Reds': 'Cincinnati Reds', 'Pirates': 'Pittsburgh Pirates',
+    'Angels': 'Los Angeles Angels', 'White Sox': 'Chicago White Sox',
+    'Rockies': 'Colorado Rockies', 'Blue Jays': 'Toronto Blue Jays',
+    'Mariners': 'Seattle Mariners', 'Red Sox': 'Boston Red Sox',
+    'Orioles': 'Baltimore Orioles', 'Padres': 'San Diego Padres',
+    'Royals': 'Kansas City Royals', 'D-backs': 'Arizona Diamondbacks',
+    'Marlins': 'Miami Marlins', 'Twins': 'Minnesota Twins', 'Cardinals': 'St. Louis Cardinals',
 }
-response = requests.get(url, headers=headers)
-print("Standings status:", response.status_code)
-print("Standings HTML snippet:", response.text[:500])
-soup = BeautifulSoup(response.text, 'html.parser')
+
+# Fetch standings from the official MLB Stats API
+SEASON = date.today().year
+standings_resp = requests.get(
+    f'https://statsapi.mlb.com/api/v1/standings?leagueId=103,104&season={SEASON}&standingsTypes=regularSeason'
+)
+standings_data = standings_resp.json()
 
 standings = pd.DataFrame(columns=['Team', 'W', 'L', 'PCT'])
-
-i = 0
-team_name_list = []
-for team in soup.find_all('tr', class_='Table__TR Table__TR--sm Table__even'):
-    if i < 15:
-        team_name = team.find('span', class_='hide-mobile').text
-        team_name_list.append(team_name)
-    if i >= 15 and i < 30:
-        wins = team.find('span', class_='stat-cell').text
-        losses = team.find_all('span', class_='stat-cell')[1].text
-        pct = team.find_all('span', class_='stat-cell')[2].text
-        new_row = pd.DataFrame([{'Team': team_name_list[i-15], 'W': wins, 'L': losses, 'PCT': pct}])
+for division in standings_data['records']:
+    for team_record in division['teamRecords']:
+        api_name = team_record['team']['name']
+        full_name = MLB_API_NAME_TO_FULL.get(api_name, api_name)
+        new_row = pd.DataFrame([{
+            'Team': full_name,
+            'W': team_record['wins'],
+            'L': team_record['losses'],
+            'PCT': float(team_record['winningPercentage']),
+        }])
         standings = pd.concat([standings, new_row], ignore_index=True)
-    i += 1
-
-# Continue with the data extraction...
-i = 0
-for team in soup.find_all('tr', class_='filled Table__TR Table__TR--sm Table__even'):
-    if i < 15:
-        team_name = team.find('span', class_='hide-mobile').text
-        team_name_list.append(team_name)
-    if i >= 15 and i < 30:
-        wins = team.find('span', class_='stat-cell').text
-        losses = team.find_all('span', class_='stat-cell')[1].text
-        pct = team.find_all('span', class_='stat-cell')[2].text
-        new_row = pd.DataFrame([{'Team': team_name_list[i], 'W': wins, 'L': losses, 'PCT': pct}])
-        standings = pd.concat([standings, new_row], ignore_index=True)
-    i += 1
-
-print("Standings rows scraped:", len(standings))
-print(standings.head())
 
 # Create a back-and-forth rank order: 1st, 16th, 2nd, 17th, 3rd, 18th, ...
 standings_reset = standings.reset_index(drop=True)
@@ -248,79 +245,91 @@ df.iloc[:, 1:] = df.iloc[:, 1:].sub(df.iloc[:, 1:].min(axis=1), axis=0)
 # format dat as Oct-22
 df['Day'] = pd.to_datetime(df['Day']).dt.strftime('%b-%d')
 
-url = 'https://www.espn.com/mlb/schedule/'
-headers = {
-    'User-Agent': 'Mozilla/5.0'
-}
-response = requests.get(url, headers=headers)
-print("Schedule status:", response.status_code)
-print("Schedule HTML snippet:", response.text[:500])
-soup = BeautifulSoup(response.text, 'html.parser')
-
-# Locate the schedule table by matching the date header in each ScheduleTables div
-matchups = []
-yesterday = []
-schedule_table = None
-yesterday_table = None
+# Fetch today's and yesterday's schedule from the official MLB Stats API
 _today = date.today()
 _yesterday = _today - timedelta(days=1)
-for _t in soup.find_all('div', class_='ScheduleTables'):
-    _title = _t.find('div', class_='Table__Title')
-    if not _title:
-        continue
-    try:
-        _d = datetime.strptime(_title.text.strip(), '%A, %B %d, %Y').date()
-        if _d == _today:
-            schedule_table = _t
-        elif _d == _yesterday:
-            yesterday_table = _t
-    except ValueError:
-        pass
 
-if schedule_table:
-    # Find each matchup row
-    rows = schedule_table.find_all('tr', class_='Table__TR--sm')
+today_resp = requests.get(
+    f'https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={_today.strftime("%Y-%m-%d")}'
+)
+today_data = today_resp.json()
 
-    for row in rows:
-        # Extract team names
-        teams = row.find_all('a', class_='AnchorLink')
-        away_team = teams[1]['href'].split('/')[-2] if teams else None
-        home_team = teams[3]['href'].split('/')[-2] if len(teams) > 1 else None
-        # Extract time
-        time = row.find('td', class_='date__col').text.strip() if row.find('td', class_='date__col') else None
-        
-        # Extract odds (e.g., point spread)
-        odds_info = row.find('div', class_='Odds__Message')
-        odds = odds_info.text.strip() if odds_info else None
+# Fetch moneyline odds from The Odds API — keyed by (home_full_name, away_full_name)
+odds_by_matchup = {}
+ODDS_API_KEY = os.environ.get('ODDS_API_KEY', '')
+if ODDS_API_KEY:
+    odds_resp = requests.get(
+        'https://api.the-odds-api.com/v4/sports/baseball_mlb/odds/',
+        params={'apiKey': ODDS_API_KEY, 'regions': 'us', 'markets': 'h2h', 'oddsFormat': 'american'}
+    )
+    if odds_resp.status_code == 200:
+        for game in odds_resp.json():
+            home_full = game['home_team']
+            away_full = game['away_team']
+            for bookmaker in game.get('bookmakers', []):
+                for market in bookmaker.get('markets', []):
+                    if market['key'] == 'h2h':
+                        prices = {o['name']: o['price'] for o in market['outcomes']}
+                        home_price = prices.get(home_full)
+                        away_price = prices.get(away_full)
+                        if home_price is not None and away_price is not None:
+                            if home_price < away_price:
+                                fav_full, fav_price = home_full, home_price
+                            else:
+                                fav_full, fav_price = away_full, away_price
+                            fav_abbr = teamToAbbr.get(fav_full, fav_full)
+                            price_str = f"+{fav_price}" if fav_price > 0 else str(fav_price)
+                            odds_by_matchup[(home_full, away_full)] = f"{fav_abbr} {price_str}"
+                        break
+                break
 
-        # Store each matchup as a dictionary
+matchups = []
+if today_data.get('dates'):
+    for game in today_data['dates'][0]['games']:
+        away_name = MLB_API_NAME_TO_FULL.get(game['teams']['away']['team']['name'], game['teams']['away']['team']['name'])
+        home_name = MLB_API_NAME_TO_FULL.get(game['teams']['home']['team']['name'], game['teams']['home']['team']['name'])
+        away_abbr = teamToAbbr.get(away_name, away_name).lower()
+        home_abbr = teamToAbbr.get(home_name, home_name).lower()
+        game_dt_utc = datetime.strptime(game['gameDate'], '%Y-%m-%dT%H:%M:%SZ')
+        # Convert UTC to ET (UTC-4 during baseball season)
+        game_dt_et = game_dt_utc - timedelta(hours=4)
+        hour = game_dt_et.hour % 12 or 12
+        game_time = f"{hour}:{game_dt_et.strftime('%M')} {'AM' if game_dt_et.hour < 12 else 'PM'} ET"
         matchups.append({
-            'away_team': away_team,
-            'home_team': home_team,
-            'time': time,
-            'odds': odds.split('O/U')[0].split('Line: ')[1] if odds else None,
+            'away_team': away_abbr,
+            'home_team': home_abbr,
+            'time': game_time,
+            'odds': odds_by_matchup.get((home_name, away_name)),
         })
-        
-if yesterday_table:
-    rows = yesterday_table.find_all('tr', class_='Table__TR--sm')
-    for row in rows:
-        # Extract team names
-        teams = row.find_all('a', class_='AnchorLink')
-        away_team = teams[1]['href'].split('/')[-2] if teams else None
-        home_team = teams[3]['href'].split('/')[-2] if len(teams) > 1 else None
-        result = teams[4].text.strip() if len(teams) > 1 else None
-        
-        if result != "Postponed":
-            yesterday.append({
-                'away_team': away_team,
-                'home_team': home_team,
-                'result': result,
-                'winner': result.split(' ')[0] if result else None,
-            })
 
-print("Matchups found:", len(matchups))
-if matchups:
-    print("Sample matchup:", matchups[0])
+yesterday_resp = requests.get(
+    f'https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={_yesterday.strftime("%Y-%m-%d")}&hydrate=linescore'
+)
+yesterday_data = yesterday_resp.json()
+
+yesterday = []
+if yesterday_data.get('dates'):
+    for game in yesterday_data['dates'][0]['games']:
+        if game.get('status', {}).get('detailedState') in ('Postponed', 'Cancelled'):
+            continue
+        away_name = MLB_API_NAME_TO_FULL.get(game['teams']['away']['team']['name'], game['teams']['away']['team']['name'])
+        home_name = MLB_API_NAME_TO_FULL.get(game['teams']['home']['team']['name'], game['teams']['home']['team']['name'])
+        away_abbr = teamToAbbr.get(away_name, away_name).lower()
+        home_abbr = teamToAbbr.get(home_name, home_name).lower()
+        home_score = game['teams']['home'].get('score', 0) or 0
+        away_score = game['teams']['away'].get('score', 0) or 0
+        if home_score > away_score:
+            winner = home_abbr
+            result = f"{home_abbr.upper()} {home_score}-{away_score}"
+        else:
+            winner = away_abbr
+            result = f"{away_abbr.upper()} {away_score}-{home_score}"
+        yesterday.append({
+            'away_team': away_abbr,
+            'home_team': home_abbr,
+            'result': result,
+            'winner': winner,
+        })
 
 # Create a DataFrame from the matchups list
 matchups_df = pd.DataFrame(matchups)
