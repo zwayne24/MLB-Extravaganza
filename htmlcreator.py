@@ -4,6 +4,9 @@ import pandas as pd
 import base64
 from pathlib import Path
 from datetime import date, timedelta, datetime
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Function to convert image to base64
 def img_to_bytes(img_path):
