@@ -113,27 +113,17 @@ for division in standings_data['records']:
     for team_record in division['teamRecords']:
         api_name = team_record['team']['name']
         full_name = MLB_API_NAME_TO_FULL.get(api_name, api_name)
+        w, l = team_record['wins'], team_record['losses']
         new_row = pd.DataFrame([{
             'Team': full_name,
-            'W': team_record['wins'],
-            'L': team_record['losses'],
-            'PCT': float(team_record['winningPercentage']),
+            'W': w,
+            'L': l,
+            'PCT': w / (w + l) if (w + l) else 0,
         }])
         standings = pd.concat([standings, new_row], ignore_index=True)
 
-# Create a back-and-forth rank order: 1st, 16th, 2nd, 17th, 3rd, 18th, ...
-standings_reset = standings.reset_index(drop=True)
-n = len(standings_reset)
-indices = []
-for i in range(n // 2):
-    indices.append(i)                 # front
-    if i + n // 2 < n:
-        indices.append(i + n // 2)    # back
-# If odd number of teams, add last middle one
-if n % 2 != 0:
-    indices.append(n // 2)
-
-overall_live_rank = {standings_reset.iloc[idx]['Team']: rnk + 1 for rnk, idx in enumerate(indices)}
+standings_sorted = standings.sort_values(by=['PCT', 'Team'], ascending=[False, True]).reset_index(drop=True)
+overall_live_rank = {row['Team']: rnk + 1 for rnk, row in standings_sorted.iterrows()}
 
 ChasesTeams = ['Toronto Blue Jays', 'Seattle Mariners', 'Boston Red Sox', 'Baltimore Orioles', 'San Diego Padres', 'Kansas City Royals', 'Arizona Diamondbacks', 'Miami Marlins', 'Minnesota Twins', 'St. Louis Cardinals']
 BrycesTeams = ['Los Angeles Dodgers', 'Philadelphia Phillies', 'Detroit Tigers', 'San Francisco Giants', 'Cleveland Guardians', 'Cincinnati Reds', 'Pittsburgh Pirates', 'Los Angeles Angels', 'Chicago White Sox', 'Colorado Rockies']
@@ -156,7 +146,7 @@ for i, team in enumerate(ChasesTeams):
 standings['W'] = standings['W'].astype(int)
 standings['L'] = standings['L'].astype(int)
 standings['PCT'] = standings['PCT'].astype(float)
-standings = standings.sort_values(by='W', ascending=False).drop(columns=['PCT'])
+standings = standings.sort_values(by=['PCT', 'Team'], ascending=[False, True]).drop(columns=['PCT'])
 
 chasesStandings = standings[standings['Team'].isin(ChasesTeams)].reset_index(drop=True)
 chasesStandings.index += 1
