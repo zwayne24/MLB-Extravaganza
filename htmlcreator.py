@@ -87,6 +87,8 @@ headers = {
     'User-Agent': 'Mozilla/5.0'
 }
 response = requests.get(url, headers=headers)
+print("Standings status:", response.status_code)
+print("Standings HTML snippet:", response.text[:500])
 soup = BeautifulSoup(response.text, 'html.parser')
 
 standings = pd.DataFrame(columns=['Team', 'W', 'L', 'PCT'])
@@ -118,6 +120,9 @@ for team in soup.find_all('tr', class_='filled Table__TR Table__TR--sm Table__ev
         new_row = pd.DataFrame([{'Team': team_name_list[i], 'W': wins, 'L': losses, 'PCT': pct}])
         standings = pd.concat([standings, new_row], ignore_index=True)
     i += 1
+
+print("Standings rows scraped:", len(standings))
+print(standings.head())
 
 # Create a back-and-forth rank order: 1st, 16th, 2nd, 17th, 3rd, 18th, ...
 standings_reset = standings.reset_index(drop=True)
@@ -248,6 +253,8 @@ headers = {
     'User-Agent': 'Mozilla/5.0'
 }
 response = requests.get(url, headers=headers)
+print("Schedule status:", response.status_code)
+print("Schedule HTML snippet:", response.text[:500])
 soup = BeautifulSoup(response.text, 'html.parser')
 
 # Locate the schedule table by matching the date header in each ScheduleTables div
@@ -310,6 +317,10 @@ if yesterday_table:
                 'result': result,
                 'winner': result.split(' ')[0] if result else None,
             })
+
+print("Matchups found:", len(matchups))
+if matchups:
+    print("Sample matchup:", matchups[0])
 
 # Create a DataFrame from the matchups list
 matchups_df = pd.DataFrame(matchups)
