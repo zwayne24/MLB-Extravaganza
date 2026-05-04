@@ -3,7 +3,7 @@ name: Update CSV and HTML
 on:
   schedule:
     # Run every day at 8 AM UTC
-    - cron: '0 10 * * *'
+    - cron: '0 8 * * *'
 
   workflow_dispatch:
 
